@@ -1,0 +1,845 @@
+/* Myntra-style Desktop Header for Fabrilife */
+/* This file contains styles for desktop/tablet header (768px+) */
+
+/* Import Myntra-style fonts - Assistant is similar to Myntra's custom font */
+@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&display=swap');
+
+/* Desktop Header Variables */
+:root {
+    --header-height: 108px; /* main row (64px) + category row (44px); topbar sits above via .site-header-stack */
+    --topbar-height-desktop: 36px;
+    --header-font: 'Assistant', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --header-bg: #ffffff;
+    --header-text: #282c3f;
+    --header-text-hover: #ff3f6c;
+    --header-border: #f5f5f6;
+    --mega-menu-bg: #ffffff;
+    --mega-menu-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    --category-heading: #ee5f73;
+    --category-link: #282c3f;
+    --category-link-hover: #ff3f6c;
+}
+
+/* Apply Myntra font to the entire page on desktop/tablet */
+@media (min-width: 768px) {
+    body {
+        font-family: var(--header-font);
+    }
+
+    h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+        font-family: var(--header-font);
+    }
+}
+
+/* Hide desktop header on mobile (below 768px) */
+@media (max-width: 767px) {
+    .desktop-header-myntra {
+        display: none !important;
+    }
+}
+
+/* Desktop Header Container (768px and above) */
+@media (min-width: 768px) {
+    /* Hide old desktop nav */
+    .nav-menu-desktop {
+        display: none !important;
+    }
+
+    /* Hide mobile nav on desktop/tablet */
+    .nav-menu-home-mobile,
+    .mobile-top-nav,
+    .mobile-bottom-nav {
+        display: none !important;
+    }
+}
+
+/* Main Header Styles */
+.desktop-header-myntra {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height);
+    padding: 0; /* Override any padding from other stylesheets (e.g., tees.css) */
+    background: var(--header-bg);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    z-index: 1000;
+    font-family: var(--header-font);
+}
+
+.desktop-header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+}
+
+/* Logo Section */
+.header-logo {
+    flex-shrink: 0;
+    margin-right: 24px;
+}
+
+.header-logo a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.header-logo img {
+    height: 40px;
+    width: auto;
+}
+
+/* Main Navigation */
+.header-nav-main {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    flex-grow: 1;
+}
+
+.nav-category-list {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-category-item {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.nav-category-link {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 16px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--header-text);
+    text-decoration: none;
+    cursor: pointer;
+    border-bottom: 4px solid transparent;
+    transition: border-color 0.2s ease;
+}
+
+.nav-category-link:hover {
+    color: var(--header-text-hover);
+    text-decoration: none;
+    border-bottom-color: var(--header-text-hover);
+}
+
+/* Category-specific border colors on hover */
+.nav-category-item[data-category="men"] .nav-category-link:hover,
+.nav-category-item[data-category="men"]:hover .nav-category-link {
+    border-bottom-color: #ee5f73;
+}
+
+.nav-category-item[data-category="women"] .nav-category-link:hover,
+.nav-category-item[data-category="women"]:hover .nav-category-link {
+    border-bottom-color: #fb56c1;
+}
+
+.nav-category-item[data-category="teens"] .nav-category-link:hover,
+.nav-category-item[data-category="teens"]:hover .nav-category-link {
+    border-bottom-color: #f26a10;
+}
+
+.nav-category-item[data-category="kids"] .nav-category-link:hover,
+.nav-category-item[data-category="kids"]:hover .nav-category-link {
+    border-bottom-color: #f2c210;
+}
+
+.nav-category-item[data-category="sports"] .nav-category-link:hover,
+.nav-category-item[data-category="sports"]:hover .nav-category-link {
+    border-bottom-color: #0db7af;
+}
+
+/* Category Active State (when selected on shop page) */
+.nav-category-item.category-active .nav-category-link {
+    color: var(--header-text-hover);
+    font-weight: 700;
+}
+
+.nav-category-item[data-category="men"].category-active .nav-category-link {
+    border-bottom-color: #ee5f73;
+}
+
+.nav-category-item[data-category="women"].category-active .nav-category-link {
+    border-bottom-color: #fb56c1;
+}
+
+.nav-category-item[data-category="teens"].category-active .nav-category-link {
+    border-bottom-color: #f26a10;
+}
+
+.nav-category-item[data-category="kids"].category-active .nav-category-link {
+    border-bottom-color: #f2c210;
+}
+
+.nav-category-item[data-category="sports"].category-active .nav-category-link {
+    border-bottom-color: #0db7af;
+}
+
+/* Search Bar */
+.header-search {
+    flex-grow: 1;
+    max-width: 450px;
+    margin: 0 24px;
+}
+
+.header-search-form {
+    position: relative;
+    width: 100%;
+}
+
+.header-search-input {
+    width: 100%;
+    height: 44px;
+    padding: 0 16px 0 16px;
+    border: none;
+    border-radius: 4px;
+    background: #f5f5f6;
+    font-family: var(--header-font);
+    font-size: 14px;
+    color: var(--header-text);
+    transition: all 0.2s ease;
+}
+
+.header-search-input::placeholder {
+    color: #94969f;
+}
+
+.header-search-input:focus {
+    outline: none;
+    background: #fff;
+    box-shadow: 0 0 0 1px #282c3f;
+}
+
+.header-search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94969f;
+    font-size: 16px;
+    pointer-events: none;
+}
+
+.header-search-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 44px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: none;
+}
+
+/* Header Actions (Icons) */
+.header-actions {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    margin-left: auto;
+}
+
+.header-action-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 14px;
+    height: 100%;
+    text-decoration: none;
+    color: var(--header-text);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s ease;
+}
+
+.header-action-item:hover {
+    color: var(--header-text-hover);
+    text-decoration: none;
+}
+
+.header-action-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+    position: relative;
+}
+
+.header-action-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+    transition: transform 0.2s ease;
+}
+
+.header-action-item:hover .header-action-icon svg {
+    transform: scale(1.05);
+}
+
+.header-action-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+/* Cart Badge */
+.header-cart-badge {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: var(--header-text-hover);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Profile Dropdown */
+.header-action-item.has-dropdown {
+    position: relative;
+}
+
+.header-profile-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 250px;
+    background: var(--mega-menu-bg);
+    box-shadow: var(--mega-menu-shadow);
+    border-radius: 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.2s ease;
+    z-index: 1001;
+}
+
+.header-action-item.has-dropdown:hover .header-profile-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.profile-dropdown-header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid #f5f5f6;
+}
+
+.profile-dropdown-header .welcome-text {
+    font-size: 14px;
+    color: #282c3f;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.profile-dropdown-header .login-signup {
+    display: flex;
+    gap: 8px;
+}
+
+.profile-dropdown-header .login-signup a {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--header-text-hover);
+    text-decoration: none;
+}
+
+.profile-dropdown-header .login-signup a:hover {
+    text-decoration: underline;
+}
+
+.profile-dropdown-header .login-signup span {
+    color: #94969f;
+}
+
+.profile-dropdown-links {
+    padding: 12px 0;
+}
+
+.profile-dropdown-links a {
+    display: block;
+    padding: 10px 20px;
+    font-size: 14px;
+    color: #282c3f;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.profile-dropdown-links a:hover {
+    background: #f5f5f6;
+}
+
+.profile-dropdown-links a i {
+    width: 20px;
+    margin-right: 12px;
+    color: #94969f;
+}
+
+.profile-dropdown-divider {
+    height: 1px;
+    background: #f5f5f6;
+    margin: 8px 0;
+}
+
+/* ==================== */
+/* MEGA MENU STYLES     */
+/* ==================== */
+
+/* Backdrop overlay when mega menu is open */
+.nav-category-item::before {
+    content: '';
+    position: fixed;
+    top: calc(var(--header-height) + var(--topbar-height-desktop));
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0);
+    pointer-events: none;
+    transition: background 0.2s ease;
+    z-index: 998;
+}
+
+.nav-category-item:hover::before {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Hover bridge - matches mega menu dimensions to maintain hover state */
+.nav-category-item::after {
+    content: '';
+    position: fixed;
+    top: calc(var(--header-height) + var(--topbar-height-desktop));
+    left: 50%;
+    transform: translateX(-50%);
+    width: 980px;
+    height: 500px;
+    pointer-events: none;
+    z-index: 997;
+}
+
+.nav-category-item:hover::after {
+    pointer-events: auto;
+}
+
+/* Mega menu - centered under header like Myntra */
+.mega-menu {
+    position: fixed;
+    top: calc(var(--header-height) + var(--topbar-height-desktop));
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    width: 980px;
+    background: var(--mega-menu-bg);
+    box-shadow: var(--mega-menu-shadow);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 999;
+    max-height: calc(100vh - var(--header-height) - var(--topbar-height-desktop) - 40px);
+    overflow: hidden;
+}
+
+.nav-category-item:hover .mega-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.mega-menu-inner {
+    padding: 28px 32px 56px;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0;
+    position: relative;
+}
+
+.mega-menu-heading {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--category-heading);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    letter-spacing: 0.3px;
+}
+
+.mega-menu-heading a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.mega-menu-heading a:hover {
+    text-decoration: underline;
+}
+
+.mega-menu-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.mega-menu-links li {
+    margin-bottom: 10px;
+}
+
+.mega-menu-links a {
+    font-size: 14px;
+    color: var(--category-link);
+    text-decoration: none;
+    transition: color 0.15s ease;
+    display: inline-block;
+}
+
+.mega-menu-links a:hover {
+    color: var(--category-link-hover);
+    font-weight: 500;
+}
+
+/* Category Specific Headings */
+.mega-menu-column[data-section="topwear"] .mega-menu-heading,
+.mega-menu-column[data-section="bottomwear"] .mega-menu-heading {
+    color: #ee5f73;
+}
+
+.mega-menu-column[data-section="boys"] .mega-menu-heading {
+    color: #ee5f73;
+}
+
+.mega-menu-column[data-section="girls"] .mega-menu-heading {
+    color: #fb56c1;
+}
+
+/* Kids Menu - Boys and Girls with different heading colors */
+.nav-category-item[data-category="kids"] .mega-menu-column[data-section="boys"] .mega-menu-heading {
+    color: #2874f0;
+}
+
+.nav-category-item[data-category="kids"] .mega-menu-column[data-section="girls"] .mega-menu-heading {
+    color: #fb56c1;
+}
+
+/* Teens Boys and Girls heading colors */
+.nav-category-item[data-category="teens"] .mega-menu-column[data-section="boys"] .mega-menu-heading {
+    color: #2874f0;
+}
+
+.nav-category-item[data-category="teens"] .mega-menu-column[data-section="girls"] .mega-menu-heading {
+    color: #fb56c1;
+}
+
+/* View All Link - positioned at bottom of mega menu */
+.mega-menu-view-all {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 32px;
+    border-top: 1px solid #eaeaec;
+    background: #fafafa;
+}
+
+.mega-menu-view-all a {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--header-text-hover);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.mega-menu-view-all a:hover {
+    text-decoration: underline;
+}
+
+/* Link hover effect with underline animation */
+.mega-menu-links a {
+    position: relative;
+}
+
+.mega-menu-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--category-link-hover);
+    transition: width 0.2s ease;
+}
+
+.mega-menu-links a:hover::after {
+    width: 100%;
+}
+
+/* Mega Menu Image Promo (optional) */
+.mega-menu-promo {
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.mega-menu-promo img {
+    max-height: 280px;
+    border-radius: 4px;
+}
+
+.mega-menu-categories {
+    display: flex;
+    gap: 32px;
+    flex-shrink: 0;
+}
+
+/* Mega Menu Columns - fixed width */
+.mega-menu-column {
+    min-width: 140px;
+    max-width: 160px;
+}
+
+/* ==================== */
+/* PRODUCT GRID         */
+/* ==================== */
+
+.mega-menu-products {
+    flex: 1;
+    min-width: 0;
+    max-width: 380px;
+    margin-left: 32px;
+    padding-left: 32px;
+    border-left: 1px solid #eaeaec;
+}
+
+.mega-menu-products-heading {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--category-heading);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    letter-spacing: 0.3px;
+}
+
+.mega-menu-products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+/* Men's mega menu: 2x2 grid for products */
+.nav-category-item[data-category="men"] .mega-menu-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.mega-menu-product-card {
+    display: block;
+    text-decoration: none;
+    color: var(--header-text);
+    transition: transform 0.2s ease;
+}
+
+.mega-menu-product-card:hover {
+    text-decoration: none;
+    color: var(--header-text);
+}
+
+.mega-menu-product-card:hover .mega-menu-product-image {
+    transform: scale(1.02);
+}
+
+.mega-menu-product-image {
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #f5f5f6;
+    transition: transform 0.2s ease;
+}
+
+.mega-menu-product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.mega-menu-product-info {
+    padding: 8px 0 0;
+    text-align: center;
+}
+
+.mega-menu-product-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #535766;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Responsive adjustments for product grid */
+@media (min-width: 768px) and (max-width: 1199px) {
+    .mega-menu-products {
+        margin-left: 32px;
+        padding-left: 32px;
+    }
+
+    .mega-menu-products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .mega-menu-product-image {
+        max-width: 100px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .mega-menu-products-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .mega-menu-product-image {
+        max-width: 120px;
+    }
+}
+
+/* ==================== */
+/* ANIMATIONS           */
+/* ==================== */
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Smooth scroll behavior for body when scrolling */
+.desktop-header-myntra.scrolled {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ==================== */
+/* RESPONSIVE TWEAKS    */
+/* ==================== */
+
+@media (min-width: 768px) and (max-width: 1199px) {
+    .nav-category-link {
+        padding: 0 12px;
+        font-size: 13px;
+    }
+
+    .header-search {
+        max-width: 350px;
+        margin: 0 16px;
+    }
+
+    .header-action-item {
+        padding: 0 10px;
+    }
+
+    .header-action-label {
+        font-size: 11px;
+    }
+
+    .mega-menu-inner {
+        gap: 32px;
+        padding: 24px 32px;
+    }
+}
+
+/* Tablet-specific adjustments (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .nav-category-link {
+        padding: 0 8px;
+        font-size: 12px;
+    }
+
+    .header-search {
+        max-width: 280px;
+        margin: 0 12px;
+    }
+
+    .header-action-item {
+        padding: 0 8px;
+    }
+
+    .header-action-label {
+        font-size: 10px;
+    }
+
+    /* Hide mega menu products on tablet to save space */
+    .mega-menu-products {
+        display: none;
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
+    .header-search {
+        max-width: 400px;
+    }
+}
+
+/* Mega Menu Overlay (click outside to close - for touch devices) */
+.mega-menu-overlay {
+    display: none;
+}
+
+/* Keep mega menu open when hovering on it */
+.mega-menu:hover {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Ensure smooth transition back */
+.nav-category-item .mega-menu {
+    pointer-events: none;
+}
+
+.nav-category-item:hover .mega-menu {
+    pointer-events: auto;
+}
+
+/* ==================== */
+/* ALGOLIA SEARCH       */
+/* ==================== */
+
+/* Style Algolia dropdown to match Myntra theme */
+.aa-Panel {
+    font-family: var(--header-font) !important;
+    border-radius: 0 !important;
+    box-shadow: var(--mega-menu-shadow) !important;
+}
+
+.aa-Item {
+    padding: 12px 16px !important;
+}
+
+.aa-Item:hover {
+    background: #f5f5f6 !important;
+}
