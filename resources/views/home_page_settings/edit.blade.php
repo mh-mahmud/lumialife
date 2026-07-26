@@ -29,6 +29,25 @@
             @endphp
 
             <div class="card mb-6">
+                <div class="card-header"><h3 class="card-title">Homepage Hero Video</h3></div>
+                <div class="card-body row g-5 align-items-start">
+                    <div class="col-lg-6">
+                        <label class="form-label fw-bolder">Hero Video</label>
+                        <input type="file" name="hero_video" class="form-control form-control-solid"
+                            accept="video/mp4,video/webm">
+                        <div class="form-text">Upload MP4 or WEBM video (maximum 50MB). A new upload will replace the current video.</div>
+                    </div>
+                    <div class="col-lg-6">
+                        <label class="form-label fw-bolder d-block">Current Video</label>
+                        <video class="rounded border w-100" style="height:220px;object-fit:cover;background:#111" muted controls playsinline>
+                            <source src="{{ $setting->hero_video ? $preview($setting->hero_video) : asset('feb/img/hero-video.mp4') }}"
+                                type="video/{{ strtolower(pathinfo($setting->hero_video ?: 'hero-video.mp4', PATHINFO_EXTENSION)) === 'webm' ? 'webm' : 'mp4' }}">
+                        </video>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-6">
                 <div class="card-header"><h3 class="card-title">Two Home Banners</h3></div>
                 <div class="card-body row g-6">
                     <div class="col-12">

@@ -11,7 +11,16 @@
             <div id="homepage">
                 <section class="video-hero" aria-label="Featured collection">
                     <video class="video-hero-media" autoplay muted loop playsinline preload="metadata">
-                        <source src="{{ asset('feb/img/hero-video.mp4') }}" type="video/mp4">
+                        @php
+                            $heroVideoPath = $homePageSetting?->hero_video;
+                            $heroVideoUrl = $heroVideoPath
+                                ? $homePageSetting->assetUrl($heroVideoPath)
+                                : asset('feb/img/hero-video.mp4');
+                            $heroVideoType = strtolower(pathinfo($heroVideoPath ?: 'hero-video.mp4', PATHINFO_EXTENSION)) === 'webm'
+                                ? 'video/webm'
+                                : 'video/mp4';
+                        @endphp
+                        <source src="{{ $heroVideoUrl }}" type="{{ $heroVideoType }}">
                     </video>
                     <div class="video-hero-shade" aria-hidden="true"></div>
                     <a class="video-hero-button" href="{{ route('shop-new') }}">SHOP NOW</a>
@@ -62,6 +71,88 @@
                     </section>
                 @endif
 
+                <section class="new-in-section" aria-labelledby="newInTitle">
+                    <h2 id="newInTitle">NEW IN</h2>
+                    <div class="new-in-slider">
+                        @foreach ($newProducts as $product)
+                            @php
+                                $newInHasDiscount = $product->discount_price > 0
+                                    && $product->discount_price < $product->product_value;
+                                $newInDiscountPercent = $newInHasDiscount
+                                    ? round((($product->product_value - $product->discount_price) / $product->product_value) * 100)
+                                    : 0;
+                            @endphp
+                            <article class="new-in-slide">
+                                <div class="new-in-card">
+                                    <a class="new-in-image" href="{{ route('single-product', $product->slug) }}">
+                                        @if ($newInHasDiscount)
+                                            <span class="new-in-sale">SAVE {{ $newInDiscountPercent }}%</span>
+                                        @endif
+                                        <img src="{{ \App\Support\MediaStorage::url($product->img_path, 'products') }}"
+                                            alt="{{ $product->name }}" loading="lazy">
+                                    </a>
+                                    <button type="button" class="new-in-action new-in-wishlist"
+                                        data-wishlist-btn data-product-id="{{ $product->id }}"
+                                        aria-label="Add {{ $product->name }} to wishlist">
+                                        <i class="fa fa-heart-o"></i>
+                                    </button>
+                                    <button type="button" class="new-in-action new-in-cart"
+                                        data-home-quick-cart="{{ $product->id }}"
+                                        data-product-url="{{ route('single-product', $product->slug) }}"
+                                        data-product-name="{{ $product->name }}"
+                                        data-product-image="{{ \App\Support\MediaStorage::url($product->img_path, 'products') }}"
+                                        data-product-price="{{ $febCurrency->format($newInHasDiscount ? $product->discount_price : $product->product_value) }}"
+                                        data-product-original-price="{{ $newInHasDiscount ? $febCurrency->format($product->product_value) : '' }}"
+                                        data-product-stock="{{ max(0, (int) $product->stock_quantity) }}"
+                                        data-product-colors="{{ base64_encode($product->productColors->map(fn ($color) => ['id' => $color->id, 'name' => $color->name, 'hex' => $color->hex_code])->values()->toJson()) }}"
+                                        data-product-sizes="{{ base64_encode($product->productSizes->map(fn ($size) => ['id' => $size->id, 'name' => $size->name])->values()->toJson()) }}"
+                                        aria-label="Add {{ $product->name }} to cart"
+                                        {{ $product->stock_status === 'Out of Stock' || (int) $product->stock_quantity <= 0 ? 'disabled' : '' }}>
+                                        <i class="fa fa-shopping-cart"></i>
+                                    </button>
+                                    <div class="new-in-copy">
+                                        <a href="{{ route('single-product', $product->slug) }}">{{ $product->name }}</a>
+                                        <div class="new-in-price">
+                                            <strong>{{ $febCurrency->format($newInHasDiscount ? $product->discount_price : $product->product_value) }}</strong>
+                                            @if ($newInHasDiscount)
+                                                <del>{{ $febCurrency->format($product->product_value) }}</del>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        @endforeach
+                    </div>
+                    <a class="new-in-view-all" href="{{ route('shop-new', ['collection' => 'new-collection']) }}">VIEW ALL</a>
+                </section>
+
+                <div class="new-in-modal" id="newInOptionsModal" aria-hidden="true">
+                    <button type="button" class="new-in-modal-backdrop" data-new-in-modal-close aria-label="Close"></button>
+                    <div class="new-in-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="newInModalTitle">
+                        <button type="button" class="new-in-modal-close" data-new-in-modal-close aria-label="Close">&times;</button>
+                        <div class="new-in-modal-media">
+                            <img id="newInModalImage" src="" alt="">
+                        </div>
+                        <div class="new-in-modal-details">
+                            <h2 id="newInModalTitle"></h2>
+                            <div class="new-in-modal-price"><strong id="newInModalPrice"></strong><del id="newInModalOriginal"></del></div>
+                            <div class="new-in-option-group" id="newInColorGroup">
+                                <span>Color:</span><div class="new-in-option-list" id="newInColorOptions"></div>
+                            </div>
+                            <div class="new-in-option-group" id="newInSizeGroup">
+                                <span>Size:</span><div class="new-in-option-list" id="newInSizeOptions"></div>
+                            </div>
+                            <div class="new-in-quantity">
+                                <button type="button" data-quantity-minus>&minus;</button>
+                                <input id="newInQuantity" type="number" min="1" value="1" aria-label="Quantity">
+                                <button type="button" data-quantity-plus>&plus;</button>
+                            </div>
+                            <button type="button" class="new-in-modal-add" id="newInModalAdd">ADD TO CART</button>
+                            <a class="new-in-modal-view" id="newInModalView" href="#">View details</a>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row hero-slider-row">
                     <div class="hero-slider">
                         @foreach ($sliders as $slider)
@@ -73,7 +164,118 @@
                     </div>
                 </div>
 
-                <div class="body-menu">
+                @if ($trendingProducts->isNotEmpty())
+                    <section class="new-in-section trending-now-section" aria-labelledby="trendingNowTitle">
+                        <h2 id="trendingNowTitle">TRENDING NOW</h2>
+                        <div class="trending-now-slider">
+                            @foreach ($trendingProducts as $product)
+                                @php
+                                    $trendingHasDiscount = $product->discount_price > 0
+                                        && $product->discount_price < $product->product_value;
+                                    $trendingDiscountPercent = $trendingHasDiscount
+                                        ? round((($product->product_value - $product->discount_price) / $product->product_value) * 100)
+                                        : 0;
+                                @endphp
+                                <article class="new-in-slide">
+                                    <div class="new-in-card">
+                                        <a class="new-in-image" href="{{ route('single-product', $product->slug) }}">
+                                            @if ($trendingHasDiscount)
+                                                <span class="new-in-sale">SAVE {{ $trendingDiscountPercent }}%</span>
+                                            @endif
+                                            <img src="{{ \App\Support\MediaStorage::url($product->img_path, 'products') }}"
+                                                alt="{{ $product->name }}" loading="lazy">
+                                        </a>
+                                        <button type="button" class="new-in-action new-in-wishlist"
+                                            data-wishlist-btn data-product-id="{{ $product->id }}"
+                                            aria-label="Add {{ $product->name }} to wishlist">
+                                            <i class="fa fa-heart-o"></i>
+                                        </button>
+                                        <button type="button" class="new-in-action new-in-cart"
+                                            data-home-quick-cart="{{ $product->id }}"
+                                            data-product-url="{{ route('single-product', $product->slug) }}"
+                                            data-product-name="{{ $product->name }}"
+                                            data-product-image="{{ \App\Support\MediaStorage::url($product->img_path, 'products') }}"
+                                            data-product-price="{{ $febCurrency->format($trendingHasDiscount ? $product->discount_price : $product->product_value) }}"
+                                            data-product-original-price="{{ $trendingHasDiscount ? $febCurrency->format($product->product_value) : '' }}"
+                                            data-product-stock="{{ max(0, (int) $product->stock_quantity) }}"
+                                            data-product-colors="{{ base64_encode($product->productColors->map(fn ($color) => ['id' => $color->id, 'name' => $color->name, 'hex' => $color->hex_code])->values()->toJson()) }}"
+                                            data-product-sizes="{{ base64_encode($product->productSizes->map(fn ($size) => ['id' => $size->id, 'name' => $size->name])->values()->toJson()) }}"
+                                            aria-label="Add {{ $product->name }} to cart"
+                                            {{ $product->stock_status === 'Out of Stock' || (int) $product->stock_quantity <= 0 ? 'disabled' : '' }}>
+                                            <i class="fa fa-shopping-cart"></i>
+                                        </button>
+                                        <div class="new-in-copy">
+                                            <a href="{{ route('single-product', $product->slug) }}">{{ $product->name }}</a>
+                                            <div class="new-in-price">
+                                                <strong>{{ $febCurrency->format($trendingHasDiscount ? $product->discount_price : $product->product_value) }}</strong>
+                                                @if ($trendingHasDiscount)
+                                                    <del>{{ $febCurrency->format($product->product_value) }}</del>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            @endforeach
+                        </div>
+                        <a class="new-in-view-all" href="{{ route('shop-new', ['collection' => 'trending']) }}">VIEW ALL</a>
+                    </section>
+                @endif
+
+                @if ($giftCardCategory && $giftCardProducts->isNotEmpty())
+                    <section class="home-gift-cards" aria-labelledby="giftCardsTitle">
+                        <h2 id="giftCardsTitle">GIFT CARDS</h2>
+                        <div class="home-gift-card-grid">
+                            @foreach ($giftCardProducts as $giftCardProduct)
+                                <a class="home-gift-card"
+                                    href="{{ route('shop-new', ['category' => $giftCardCategory->category_slug]) }}">
+                                    <img src="{{ \App\Support\MediaStorage::url($giftCardProduct->img_path, 'products') }}"
+                                        alt="{{ $giftCardProduct->name }}" loading="lazy">
+                                    <span>{{ strtoupper($giftCardProduct->name) }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                        <a class="home-gift-card-view-all"
+                            href="{{ route('shop-new', ['category' => $giftCardCategory->category_slug]) }}">VIEW ALL</a>
+                    </section>
+                @endif
+
+                @if ($sliderBottomCategories->isNotEmpty())
+                    <section class="explore-styles-section" aria-labelledby="exploreStylesTitle">
+                        <h2 id="exploreStylesTitle">EXPLORE MORE STYLES</h2>
+                        <div class="explore-styles-carousel">
+                            @foreach ($sliderBottomCategories as $styleCategory)
+                                @php
+                                    $styleCategoryValue = $styleCategory->category_slug ?: $styleCategory->id;
+                                    $styleCategoryImage = $styleCategory->category_image
+                                        ? \App\Support\MediaStorage::url($styleCategory->category_image, 'categories')
+                                        : asset('uploads/blank.png');
+                                @endphp
+                                <div class="explore-style-slide">
+                                    <a href="{{ route('shop-new', ['category' => $styleCategoryValue]) }}"
+                                        class="explore-style-card">
+                                        <img src="{{ $styleCategoryImage }}" alt="{{ $styleCategory->category_name }}" loading="lazy">
+                                        <span>{{ strtoupper($styleCategory->category_name) }}</span>
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
+
+                <section class="home-newsletter" aria-labelledby="newsletterTitle">
+                    <h2 id="newsletterTitle">SIGN UP TO GET OUR NEWSLETTER</h2>
+                    <form id="homeNewsletterForm" action="{{ route('newsletter.subscribe') }}" method="POST">
+                        @csrf
+                        <input type="email" name="email" placeholder="Enter your email"
+                            aria-label="Email address" autocomplete="email" required>
+                        <button type="submit" aria-label="Subscribe">
+                            <i class="fa fa-paper-plane"></i>
+                        </button>
+                    </form>
+                    <p class="home-newsletter-message" id="homeNewsletterMessage" aria-live="polite"></p>
+                </section>
+
+                {{-- <div class="body-menu">
                     @php
                         $sliderBottomMenuItemWidth = 100 / max($sliderBottomCategories->count() + 1, 1);
                     @endphp
@@ -94,7 +296,7 @@
                             </div>
                         @endforeach
                     </div>
-                </div>
+                </div> --}}
 
                 {{-- <div class="home-element" style="margin-top: 7px">
                 <a href="/corporate">
@@ -118,7 +320,13 @@
 
             </div>
 
-            <div class="home-content">
+        </div>
+    </div>
+
+    {{-- Newsletter-এর পরের পুরোনো homepage sections সংরক্ষিত আছে, কিন্তু frontend-এ render হবে না। --}}
+    @if (false)
+
+            <div class="home-content legacy-new-arrival-section">
                 <div class="home-element">
                     <div class="row">
                         <div class="col-lg-12">
@@ -127,7 +335,7 @@
                                 <a class="hot-container-link mindfordesign"
                                     href="{{ route('shop-new', ['collection' => 'new-collection']) }}">
                                     <div class="hot-image-title light">
-                                        <div class="hot-topic">New Collection</div>
+                                        <div class="hot-topic">New Arrival</div>
                                     </div>
 
                                 </a>
@@ -145,11 +353,11 @@
                 </div>
             </div>
 
-            <div class="home-element">
+            <div class="home-element legacy-new-arrival-section">
                 <div class="row">
                     <div class="col-md-12 ">
 
-                        <div class="your-class">
+                        <div class="your-class new-arrival-products-slider">
                             @forelse($newProducts as $product)
                                 @php
                                     $hasDiscount =
@@ -6432,6 +6640,7 @@
     </div>
     </div>
     </div>
+    @endif
 
     <style>
         .home-discount-badge {
@@ -6627,6 +6836,178 @@
             margin: 10px 0 0;
         }
 
+        .home-gift-cards {
+            padding: 34px 8px 42px;
+            background: #fff;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .home-gift-cards > h2 {
+            margin: 0 0 32px;
+            color: #050505;
+            font-size: 34px;
+            font-weight: 800;
+            line-height: 1.1;
+            text-align: center;
+        }
+        .home-gift-card-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 22px;
+        }
+        .home-gift-card {
+            position: relative;
+            display: block;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            background: #e5e5e5;
+            color: #050505 !important;
+            text-decoration: none !important;
+        }
+        .home-gift-card img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .4s ease;
+        }
+        .home-gift-card:hover img { transform: scale(1.025); }
+        .home-gift-card span {
+            position: absolute;
+            bottom: 28px;
+            left: 50%;
+            min-width: 150px;
+            transform: translateX(-50%);
+            background: #fff;
+            padding: 12px 18px;
+            color: #050505;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 20px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .home-gift-card-view-all {
+            display: block;
+            width: max-content;
+            min-width: 130px;
+            margin: 28px auto 0;
+            border-radius: 24px;
+            background: #171717;
+            padding: 12px 22px;
+            color: #fff !important;
+            font-size: 14px;
+            text-align: center;
+            text-decoration: none !important;
+        }
+
+        .explore-styles-section {
+            padding: 58px 24px 70px;
+            overflow: hidden;
+            border-top: 1px solid #eee;
+            background: #fff;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .explore-styles-section > h2 {
+            margin: 0 0 48px;
+            color: #050505;
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: 9px;
+            line-height: 1.2;
+            text-align: center;
+        }
+        .explore-styles-carousel { margin: 0 -8px; }
+        .explore-style-slide { padding: 0 8px; }
+        .explore-style-card {
+            position: relative;
+            display: block;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            border-radius: 50%;
+            background: #eee;
+            color: #fff !important;
+            box-shadow: 0 6px 16px rgba(0,0,0,.14);
+            text-decoration: none !important;
+        }
+        .explore-style-card img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .4s ease;
+        }
+        .explore-style-card:hover img { transform: scale(1.04); }
+        .explore-style-card span {
+            position: absolute;
+            right: 0;
+            bottom: 18px;
+            left: 0;
+            background: rgba(24,18,14,.68);
+            padding: 7px 5px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            line-height: 17px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .explore-styles-carousel .slick-prev,
+        .explore-styles-carousel .slick-next { z-index: 5; }
+        .explore-styles-carousel .slick-prev { left: 6px; }
+        .explore-styles-carousel .slick-next { right: 6px; }
+
+        .home-newsletter {
+            padding: 55px 20px 68px;
+            border-top: 1px solid #eee;
+            background: #fff;
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+        }
+        .home-newsletter h2 {
+            margin: 0 0 32px;
+            color: #050505;
+            font-size: 34px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+        .home-newsletter form {
+            display: flex;
+            width: min(450px, 100%);
+            height: 56px;
+            align-items: center;
+            margin: 0 auto;
+            overflow: hidden;
+            border: 1px solid #e1e1e1;
+            border-radius: 30px;
+            background: #fff;
+        }
+        .home-newsletter input {
+            min-width: 0;
+            height: 100%;
+            flex: 1;
+            border: 0;
+            outline: 0;
+            padding: 0 0 0 30px;
+            color: #222;
+            font-size: 17px;
+        }
+        .home-newsletter input::placeholder { color: #777; }
+        .home-newsletter button {
+            width: 62px;
+            height: 100%;
+            flex-shrink: 0;
+            border: 0;
+            background: transparent;
+            color: #777;
+            font-size: 20px;
+            cursor: pointer;
+            transition: color .2s ease, transform .2s ease;
+        }
+        .home-newsletter button:hover { transform: translateX(2px); color: #ed1c24; }
+        .home-newsletter-message { min-height: 20px; margin: 12px 0 0; color: #17823b; font-size: 13px; }
+        .home-newsletter-message.is-error { color: #d1252b; }
+
         .video-hero {
             position: relative;
             width: 100%;
@@ -6819,6 +7200,174 @@
             background: #e91d2a;
         }
 
+        .legacy-new-arrival-section { display: none !important; }
+
+        .new-in-section {
+            padding: 54px 30px 42px;
+            overflow: hidden;
+            background: #fff;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .new-in-section > h2 {
+            margin: 0 0 45px;
+            color: #050505;
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .new-in-slider,
+        .trending-now-slider { margin: 0 -6px; }
+        .new-in-slide { padding: 0 6px; }
+        .new-in-card { position: relative; }
+        .new-in-image {
+            position: relative;
+            display: block;
+            aspect-ratio: 1 / 1.42;
+            overflow: hidden;
+            background: #eee;
+        }
+        .new-in-image img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .4s ease;
+        }
+        .new-in-card:hover .new-in-image img { transform: scale(1.02); }
+        .new-in-sale {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2;
+            background: #ef2b32;
+            padding: 4px 8px;
+            color: #fff;
+            font-size: 11px;
+            line-height: 15px;
+        }
+        .new-in-action {
+            position: absolute;
+            right: 14px;
+            z-index: 4;
+            display: flex;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            transform: translateX(8px);
+            border: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,.96);
+            color: #111;
+            box-shadow: 0 2px 10px rgba(0,0,0,.15);
+            opacity: 0;
+            cursor: pointer;
+            transition: opacity .18s ease, transform .18s ease, color .18s ease;
+        }
+        .new-in-wishlist { top: 14px; }
+        .new-in-cart { top: 62px; }
+        .new-in-action i { margin: 0; font-size: 18px; }
+        .new-in-card:hover .new-in-action,
+        .new-in-action.active { transform: translateX(0); opacity: 1; }
+        .new-in-action:hover { color: #ed1c24; transform: scale(1.05); }
+        .new-in-action:disabled { display: none; }
+        .new-in-copy { padding: 25px 8px 8px; text-align: center; }
+        .new-in-copy > a {
+            display: block;
+            min-height: 20px;
+            overflow: hidden;
+            color: #090909;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: .7px;
+            line-height: 18px;
+            text-decoration: none;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .new-in-price { margin-top: 8px; font-size: 13px; }
+        .new-in-price strong { color: #ef3038; font-weight: 500; }
+        .new-in-price del { margin-left: 8px; color: #666; }
+        .new-in-view-all {
+            display: block;
+            width: max-content;
+            min-width: 138px;
+            margin: 34px auto 0;
+            border-radius: 25px;
+            background: #171717;
+            padding: 13px 24px;
+            color: #fff !important;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none !important;
+        }
+        .new-in-view-all:hover { background: #ed1c24; }
+        .new-in-slider .slick-prev,
+        .new-in-slider .slick-next,
+        .trending-now-slider .slick-prev,
+        .trending-now-slider .slick-next {
+            z-index: 6;
+            width: 32px;
+            height: 48px;
+            border-radius: 0;
+            background: transparent !important;
+            box-shadow: none;
+        }
+        .new-in-slider .slick-prev:hover,
+        .new-in-slider .slick-next:hover,
+        .new-in-slider .slick-prev:focus,
+        .new-in-slider .slick-next:focus,
+        .trending-now-slider .slick-prev:hover,
+        .trending-now-slider .slick-next:hover,
+        .trending-now-slider .slick-prev:focus,
+        .trending-now-slider .slick-next:focus { background: transparent !important; }
+        .new-in-slider .slick-prev,
+        .trending-now-slider .slick-prev { left: 18px; }
+        .new-in-slider .slick-next,
+        .trending-now-slider .slick-next { right: 18px; }
+        .new-in-slider .slick-prev::before,
+        .new-in-slider .slick-next::before,
+        .trending-now-slider .slick-prev::before,
+        .trending-now-slider .slick-next::before {
+            color: #111;
+            font-family: FontAwesome;
+            font-size: 30px;
+            opacity: 1;
+            text-shadow: 0 1px 2px rgba(255,255,255,.85);
+        }
+        .new-in-slider .slick-prev::before,
+        .trending-now-slider .slick-prev::before { content: '\f104'; }
+        .new-in-slider .slick-next::before,
+        .trending-now-slider .slick-next::before { content: '\f105'; }
+
+        .new-in-modal { position: fixed; inset: 0; z-index: 12000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .new-in-modal.is-open { display: flex; }
+        .new-in-modal-backdrop { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: rgba(0,0,0,.48); }
+        .new-in-modal-dialog { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, .95fr); width: min(840px, 94vw); max-height: 90vh; overflow-y: auto; background: #fff; padding: 54px 48px; box-shadow: 0 20px 60px rgba(0,0,0,.24); }
+        .new-in-modal-close { position: absolute; top: 18px; right: 24px; z-index: 3; border: 0; background: transparent; color: #111; font-size: 32px; font-weight: 300; line-height: 1; cursor: pointer; }
+        .new-in-modal-media { display: flex; align-items: center; justify-content: center; padding-right: 38px; }
+        .new-in-modal-media img { display: block; width: 100%; max-height: 520px; object-fit: contain; background: #f2f2f2; }
+        .new-in-modal-details { align-self: center; font-family: Arial, Helvetica, sans-serif; }
+        .new-in-modal-details h2 { margin: 0 0 14px; color: #080808; font-size: 22px; font-weight: 500; letter-spacing: 1.5px; line-height: 1.3; text-transform: uppercase; }
+        .new-in-modal-price { display: flex; align-items: center; gap: 14px; margin-bottom: 34px; }
+        .new-in-modal-price strong { color: #ef3038; font-size: 20px; font-weight: 500; }
+        .new-in-modal-price del { color: #666; font-size: 14px; }
+        .new-in-option-group { margin-bottom: 20px; }
+        .new-in-option-group > span { display: block; margin-bottom: 10px; color: #111; font-size: 16px; letter-spacing: 1px; }
+        .new-in-option-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .new-in-option-button { min-width: 48px; border: 1px solid #aaa; background: #fff; padding: 10px 13px; color: #111; cursor: pointer; }
+        .new-in-option-button.is-selected { border-color: #111; outline: 1px solid #111; }
+        .new-in-color-dot { display: inline-block; width: 15px; height: 15px; margin-right: 7px; border: 1px solid #ddd; border-radius: 50%; vertical-align: -2px; }
+        .new-in-quantity { display: grid; grid-template-columns: 38px 48px 38px; width: max-content; margin: 24px 0 28px; border: 1px solid #ddd; }
+        .new-in-quantity button, .new-in-quantity input { height: 40px; border: 0; background: #fff; text-align: center; }
+        .new-in-quantity input { width: 48px; appearance: textfield; }
+        .new-in-modal-add { width: 100%; border: 0; border-radius: 26px; background: #171717; padding: 14px 20px; color: #fff; font-size: 15px; cursor: pointer; }
+        .new-in-modal-view { display: inline-block; margin-top: 26px; border-bottom: 1px solid #111; color: #111 !important; font-size: 15px; text-decoration: none !important; }
+
         .hero-slider,
         .hero-slider .slick-list,
         .hero-slider .slick-track {
@@ -6856,6 +7405,21 @@
         }
 
         @media (max-width: 767px) {
+            .home-gift-cards { padding: 25px 6px 30px; }
+            .home-gift-cards > h2 { margin-bottom: 20px; font-size: 23px; }
+            .home-gift-card-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 6px; }
+            .home-gift-card span { bottom: 10px; min-width: 90px; padding: 8px 10px; font-size: 11px; line-height: 14px; }
+            .home-gift-card-view-all { margin-top: 20px; min-width: 110px; padding: 10px 18px; font-size: 12px; }
+            .explore-styles-section { padding: 34px 10px 42px; }
+            .explore-styles-section > h2 { margin-bottom: 27px; font-size: 21px; letter-spacing: 4px; }
+            .explore-style-slide { padding: 0 5px; }
+            .explore-style-card span { bottom: 12px; padding: 5px 3px; font-size: 9px; letter-spacing: .7px; line-height: 12px; }
+            .home-newsletter { padding: 38px 16px 48px; }
+            .home-newsletter h2 { margin-bottom: 24px; font-size: 23px; }
+            .home-newsletter form { height: 50px; }
+            .home-newsletter input { padding-left: 20px; font-size: 14px; }
+            .home-newsletter button { width: 52px; font-size: 17px; }
+
             .video-hero {
                 margin: 10px 11px 0;
                 width: calc(100% - 22px);
@@ -6924,6 +7488,40 @@
                 padding: 9px 22px;
                 font-size: 13px;
             }
+
+            .new-in-section { padding: 34px 10px 30px; }
+            .new-in-section > h2 { margin-bottom: 25px; font-size: 24px; }
+            .new-in-slide { padding: 0 4px; }
+            .new-in-image { aspect-ratio: 1 / 1.35; }
+            .new-in-copy { padding: 13px 4px 5px; }
+            .new-in-copy > a { font-size: 10px; letter-spacing: .3px; }
+            .new-in-price { margin-top: 5px; font-size: 11px; }
+            .new-in-action { right: 8px; width: 34px; height: 34px; transform: none; opacity: 1; }
+            .new-in-wishlist { top: 8px; }
+            .new-in-cart { top: 48px; }
+            .new-in-action i { font-size: 15px; }
+            .new-in-view-all { margin-top: 24px; min-width: 120px; padding: 10px 20px; font-size: 12px; }
+            .new-in-slider .slick-prev,
+            .new-in-slider .slick-next,
+            .trending-now-slider .slick-prev,
+            .trending-now-slider .slick-next {
+                width: 28px;
+                height: 42px;
+            }
+            .new-in-slider .slick-prev,
+            .trending-now-slider .slick-prev { left: 8px; }
+            .new-in-slider .slick-next,
+            .trending-now-slider .slick-next { right: 8px; }
+            .new-in-slider .slick-prev::before,
+            .new-in-slider .slick-next::before,
+            .trending-now-slider .slick-prev::before,
+            .trending-now-slider .slick-next::before { font-size: 26px; }
+            .new-in-modal { padding: 10px; }
+            .new-in-modal-dialog { grid-template-columns: 1fr; width: min(480px, 96vw); padding: 45px 20px 28px; }
+            .new-in-modal-media { padding: 0 35px 22px; }
+            .new-in-modal-media img { max-height: 300px; }
+            .new-in-modal-details h2 { font-size: 17px; }
+            .new-in-modal-price { margin-bottom: 22px; }
 
             .hero-slider-row {
                 margin: 10px 11px 0;
@@ -7066,6 +7664,235 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            var newsletterForm = document.getElementById('homeNewsletterForm');
+            if (newsletterForm) {
+                newsletterForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    var message = document.getElementById('homeNewsletterMessage');
+                    var submitButton = newsletterForm.querySelector('button');
+                    var oldButtonHtml = submitButton.innerHTML;
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+                    message.textContent = '';
+                    message.classList.remove('is-error');
+
+                    fetch(newsletterForm.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': newsletterForm.querySelector('[name="_token"]').value,
+                            'Accept': 'application/json'
+                        },
+                        body: new FormData(newsletterForm)
+                    }).then(function(response) {
+                        return response.json().then(function(data) {
+                            if (!response.ok) throw data;
+                            return data;
+                        });
+                    }).then(function(data) {
+                        message.textContent = data.message;
+                        newsletterForm.reset();
+                    }).catch(function(error) {
+                        message.classList.add('is-error');
+                        message.textContent = error.errors && error.errors.email
+                            ? error.errors.email[0] : 'Please enter a valid email address.';
+                    }).then(function() {
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = oldButtonHtml;
+                    });
+                });
+            }
+
+            var $exploreStyles = $('.explore-styles-carousel').not('.slick-initialized');
+            if ($exploreStyles.length) {
+                var exploreCount = $exploreStyles.children().length;
+                $exploreStyles.slick({
+                    dots: false,
+                    arrows: exploreCount > 1,
+                    infinite: exploreCount > 8,
+                    speed: 350,
+                    slidesToShow: Math.min(8, exploreCount),
+                    slidesToScroll: 1,
+                    responsive: [
+                        { breakpoint: 1400, settings: { slidesToShow: Math.min(6, exploreCount) } },
+                        { breakpoint: 992, settings: { slidesToShow: Math.min(4, exploreCount) } },
+                        { breakpoint: 600, settings: { slidesToShow: Math.min(3, exploreCount) } },
+                        { breakpoint: 400, settings: { slidesToShow: Math.min(2, exploreCount) } }
+                    ]
+                });
+            }
+
+            var $newInSlider = $('.new-in-slider').not('.slick-initialized');
+            if ($newInSlider.length) {
+                $newInSlider.slick({
+                    dots: false,
+                    arrows: true,
+                    infinite: $newInSlider.children().length > 4,
+                    speed: 350,
+                    slidesToShow: 4,
+                    slidesToScroll: 1,
+                    responsive: [
+                        { breakpoint: 1200, settings: { slidesToShow: 3 } },
+                        { breakpoint: 768, settings: { slidesToShow: 2, arrows: true } },
+                        { breakpoint: 420, settings: { slidesToShow: 1, arrows: true } }
+                    ]
+                });
+            }
+
+            var $trendingNowSlider = $('.trending-now-slider').not('.slick-initialized');
+            if ($trendingNowSlider.length) {
+                $trendingNowSlider.slick({
+                    dots: false,
+                    arrows: true,
+                    infinite: $trendingNowSlider.children().length > 4,
+                    speed: 350,
+                    slidesToShow: 4,
+                    slidesToScroll: 1,
+                    responsive: [
+                        { breakpoint: 1200, settings: { slidesToShow: 3 } },
+                        { breakpoint: 768, settings: { slidesToShow: 2, arrows: true } },
+                        { breakpoint: 420, settings: { slidesToShow: 1, arrows: true } }
+                    ]
+                });
+            }
+
+            var optionsModal = document.getElementById('newInOptionsModal');
+            var modalProduct = null;
+            var selectedColor = null;
+            var selectedSize = null;
+
+            function decodeOptions(value) {
+                if (!value) return [];
+                try {
+                    var bytes = Uint8Array.from(atob(value), function(char) { return char.charCodeAt(0); });
+                    return JSON.parse(new TextDecoder().decode(bytes));
+                } catch (error) { return []; }
+            }
+
+            function updateCartBadges(count) {
+                document.querySelectorAll('.shopping-cart-badge, #cartBadge').forEach(function(badge) {
+                    badge.textContent = count > 99 ? '99+' : count;
+                    badge.style.display = count ? 'flex' : 'none';
+                });
+            }
+
+            function addNewInProduct(product, quantity, colorId, sizeId, button) {
+                if (typeof window.axios === 'undefined') return;
+                var oldText = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+                window.axios.post('{{ route('ajax-add-to-cart') }}', {
+                    product_id: product.id,
+                    quantity: quantity,
+                    color_id: colorId,
+                    size_id: sizeId
+                }, { headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }}).then(function(response) {
+                    updateCartBadges(response.data && response.data.cart_count ? response.data.cart_count : 0);
+                    if (optionsModal) {
+                        optionsModal.classList.remove('is-open');
+                        optionsModal.setAttribute('aria-hidden', 'true');
+                        document.body.style.overflow = '';
+                    }
+                }).catch(function(error) {
+                    var message = error.response && error.response.data && error.response.data.message
+                        ? error.response.data.message : 'Could not add this product to cart.';
+                    window.alert(message);
+                }).then(function() {
+                    button.disabled = false;
+                    button.innerHTML = oldText;
+                });
+            }
+
+            function renderOptions(container, items, type) {
+                container.innerHTML = '';
+                items.forEach(function(item) {
+                    var button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'new-in-option-button';
+                    if (type === 'color') {
+                        var dot = document.createElement('span');
+                        dot.className = 'new-in-color-dot';
+                        dot.style.background = item.hex || '#eee';
+                        button.appendChild(dot);
+                    }
+                    button.appendChild(document.createTextNode(item.name));
+                    button.addEventListener('click', function() {
+                        container.querySelectorAll('.new-in-option-button').forEach(function(option) {
+                            option.classList.remove('is-selected');
+                        });
+                        button.classList.add('is-selected');
+                        if (type === 'color') selectedColor = item.id;
+                        else selectedSize = item.id;
+                    });
+                    container.appendChild(button);
+                });
+            }
+
+            function openOptionsModal(product) {
+                modalProduct = product;
+                selectedColor = null;
+                selectedSize = null;
+                document.getElementById('newInModalImage').src = product.image;
+                document.getElementById('newInModalImage').alt = product.name;
+                document.getElementById('newInModalTitle').textContent = product.name;
+                document.getElementById('newInModalPrice').textContent = product.price;
+                document.getElementById('newInModalOriginal').textContent = product.originalPrice;
+                document.getElementById('newInModalOriginal').style.display = product.originalPrice ? '' : 'none';
+                document.getElementById('newInModalView').href = product.url;
+                document.getElementById('newInQuantity').value = 1;
+                document.getElementById('newInQuantity').max = product.stock;
+                document.getElementById('newInColorGroup').style.display = product.colors.length ? '' : 'none';
+                document.getElementById('newInSizeGroup').style.display = product.sizes.length ? '' : 'none';
+                renderOptions(document.getElementById('newInColorOptions'), product.colors, 'color');
+                renderOptions(document.getElementById('newInSizeOptions'), product.sizes, 'size');
+                optionsModal.classList.add('is-open');
+                optionsModal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            }
+
+            document.querySelectorAll('[data-home-quick-cart]').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var product = {
+                        id: button.dataset.homeQuickCart,
+                        name: button.dataset.productName,
+                        image: button.dataset.productImage,
+                        price: button.dataset.productPrice,
+                        originalPrice: button.dataset.productOriginalPrice,
+                        stock: parseInt(button.dataset.productStock, 10) || 1,
+                        colors: decodeOptions(button.dataset.productColors),
+                        sizes: decodeOptions(button.dataset.productSizes),
+                        url: button.dataset.productUrl
+                    };
+                    if (product.colors.length || product.sizes.length) openOptionsModal(product);
+                    else addNewInProduct(product, 1, null, null, button);
+                });
+            });
+
+            document.querySelectorAll('[data-new-in-modal-close]').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    optionsModal.classList.remove('is-open');
+                    optionsModal.setAttribute('aria-hidden', 'true');
+                    document.body.style.overflow = '';
+                });
+            });
+            document.querySelector('[data-quantity-minus]').addEventListener('click', function() {
+                var input = document.getElementById('newInQuantity');
+                input.value = Math.max(1, (parseInt(input.value, 10) || 1) - 1);
+            });
+            document.querySelector('[data-quantity-plus]').addEventListener('click', function() {
+                var input = document.getElementById('newInQuantity');
+                input.value = Math.min(parseInt(input.max, 10) || 999, (parseInt(input.value, 10) || 1) + 1);
+            });
+            document.getElementById('newInModalAdd').addEventListener('click', function() {
+                if (!modalProduct) return;
+                if (modalProduct.colors.length && !selectedColor) return window.alert('Please select a color.');
+                if (modalProduct.sizes.length && !selectedSize) return window.alert('Please select a size.');
+                var quantity = Math.max(1, parseInt(document.getElementById('newInQuantity').value, 10) || 1);
+                addNewInProduct(modalProduct, quantity, selectedColor, selectedSize, this);
+            });
+
             var $heroSlider = $('.hero-slider').not('.slick-initialized');
 
             $heroSlider.slick({

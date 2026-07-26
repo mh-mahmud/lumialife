@@ -1516,6 +1516,63 @@
             display: none !important;
         }
         .feb-shop-page #hits { padding: 0 !important; }
+        .feb-shop-page .shop-empty-state {
+            grid-column: 1 / -1;
+            display: flex;
+            min-height: 390px;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            margin: 0;
+            padding: 55px 20px;
+            border: 1px solid #ededed !important;
+            background: linear-gradient(180deg, #fff 0%, #fafafa 100%);
+            color: #111;
+            text-align: center;
+        }
+        .feb-shop-page .shop-empty-icon {
+            display: flex;
+            width: 82px;
+            height: 82px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            border-radius: 50%;
+            background: #f1f1f1;
+            color: #222;
+            font-size: 30px;
+        }
+        .feb-shop-page .shop-empty-state h2 {
+            margin: 0 0 10px;
+            color: #090909;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 25px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .feb-shop-page .shop-empty-state p {
+            max-width: 500px;
+            margin: 0 0 25px;
+            color: #6f6f6f;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .feb-shop-page .shop-empty-state a {
+            min-width: 175px;
+            border-radius: 24px;
+            background: #171717;
+            padding: 12px 24px;
+            color: #fff !important;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .6px;
+            text-decoration: none !important;
+            transition: background .2s ease, transform .2s ease;
+        }
+        .feb-shop-page .shop-empty-state a:hover {
+            transform: translateY(-2px);
+            background: #ed1c24;
+        }
         .feb-shop-page #hits .ais-InfiniteHits-list {
             grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
             column-gap: 22px !important;
@@ -1704,6 +1761,10 @@
             }
             .feb-shop-page .price-current { font-size: 13px; }
             .feb-shop-page .product-details { min-height: 68px; }
+            .feb-shop-page .shop-empty-state { min-height: 330px; padding: 42px 16px; }
+            .feb-shop-page .shop-empty-icon { width: 68px; height: 68px; margin-bottom: 20px; font-size: 25px; }
+            .feb-shop-page .shop-empty-state h2 { font-size: 20px; }
+            .feb-shop-page .shop-empty-state p { font-size: 13px; }
             .feb-shop-page .btn-wishlist,
             .feb-shop-page .btn-add-cart {
                 right: 8px;
@@ -1716,6 +1777,39 @@
             .feb-shop-page .btn-add-cart { top: 48px; }
             .feb-shop-page .btn-wishlist i,
             .feb-shop-page .btn-add-cart i { font-size: 16px; }
+        }
+
+        /* Match the homepage New In option modal */
+        .pricemodal .modal-dialog { width: min(840px, 94vw); max-width: 840px; margin: 5vh auto; }
+        .pricemodal .modal-content { overflow: visible; border: 0; border-radius: 0; box-shadow: 0 20px 60px rgba(0,0,0,.24); }
+        .pricemodal .modal-header { position: static; min-height: 0; border: 0; background: #fff; padding: 0; }
+        .pricemodal .modal-header .pricemodal-header { display: none; }
+        .pricemodal .modal-header .close { top: 18px; right: 24px; z-index: 20; width: auto; height: auto; border-radius: 0; background: transparent; color: #111; font-size: 32px; opacity: 1; }
+        .pricemodal .pricemodal-content { display: grid; grid-template-columns: minmax(0,1fr) minmax(320px,.95fr); padding: 54px 48px; background: #fff; }
+        .pricemodal .card-view { display: flex !important; width: auto !important; padding: 0 38px 0 0 !important; border: 0 !important; background: #fff; }
+        .pricemodal .card-photo-container { width: 100% !important; max-width: none !important; border-radius: 0; box-shadow: none; background: #f2f2f2; }
+        .pricemodal img.card-photo { width: 100% !important; max-height: 520px; object-fit: contain; }
+        .pricemodal .shop-modal-details { align-self: center; font-family: Arial,Helvetica,sans-serif; }
+        .pricemodal .card-title { width: 100%; max-height: none; margin: 0 0 14px; color: #080808; font-size: 22px; font-weight: 500; letter-spacing: 1.5px; line-height: 1.3; text-align: left; text-transform: uppercase; }
+        .pricemodal .shop-modal-price { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+        .pricemodal .shop-modal-price strong { color: #ef3038; font-size: 20px; font-weight: 500; }
+        .pricemodal .shop-modal-price del { color: #666; font-size: 14px; }
+        .pricemodal .size-guide-toggle { margin: 0 0 20px; padding: 0; color: #ef3038; }
+        .pricemodal .modal-body.pricemodal-body { width: 100%; padding: 0; float: none; }
+        .pricemodal .shop-option-group { margin-bottom: 20px; }
+        .pricemodal .shop-option-label { margin-bottom: 10px; color: #111; font-size: 16px; font-weight: 400; letter-spacing: 1px; }
+        .pricemodal .shop-option-button { min-width: 48px; min-height: 42px; border-radius: 0; border-color: #aaa; padding: 10px 13px; color: #111; }
+        .pricemodal .shop-option-button.is-selected { border-color: #111; outline: 1px solid #111; background: #fff; color: #111; }
+        .pricemodal .shop-modal-quantity { width: 134px; height: 42px; border-radius: 0; text-align: center; }
+        .pricemodal .modal-footer.pricemodal-footer { margin-top: 26px; padding: 0; border: 0; background: #fff; }
+        .pricemodal .modal-footer .btn-success { border: 0 !important; border-radius: 26px; background: #171717 !important; padding: 14px 20px; font-size: 15px; font-weight: 400; }
+        .pricemodal .shop-modal-view-details { display: inline-block; margin-top: 26px; border-bottom: 1px solid #111; color: #111; font-size: 15px; text-decoration: none; }
+        @media (max-width: 767px) {
+            .pricemodal .modal-dialog { width: min(480px,96vw); margin: 2vh auto; }
+            .pricemodal .pricemodal-content { grid-template-columns: 1fr; padding: 45px 20px 28px; }
+            .pricemodal .card-view { padding: 0 35px 22px !important; }
+            .pricemodal img.card-photo { max-height: 300px; }
+            .pricemodal .card-title { font-size: 17px; }
         }
     </style>
     <div class="wrapper-div feb-shop-page">
@@ -3137,6 +3231,9 @@
                                                         data-product-id="{{ $product->id }}"
                                                         data-title="{{ $product->name }}"
                                                         data-image="{{ \App\Support\MediaStorage::url($product->img_path, 'products') }}"
+                                                        data-url="{{ route('single-product', $product->slug) }}"
+                                                        data-price="{{ $febCurrency->format($hasDiscount ? $product->discount_price : $product->product_value) }}"
+                                                        data-original-price="{{ $hasDiscount ? $febCurrency->format($product->product_value) : '' }}"
                                                         data-stock="{{ max(0, (int) $product->stock_quantity) }}"
                                                         data-colors="{{ $product->productColors->map(fn($color) => ['id' => $color->id, 'name' => $color->name, 'hex_code' => $color->hex_code])->values()->toJson() }}"
                                                         data-sizes="{{ $product->productSizes->map(fn($size) => ['id' => $size->id, 'name' => $size->name])->values()->toJson() }}"
@@ -3147,11 +3244,22 @@
                                             </div>
                                         </li>
                                     @empty
-                                        <div class="text-center w-100 py-5">
-                                            <h4>No products
-                                                found{{ $selectedCollectionTitle ? ' in ' . $selectedCollectionTitle : ' in this category' }}.
-                                            </h4>
-                                        </div>
+                                        <li class="shop-empty-state">
+                                            <span class="shop-empty-icon" aria-hidden="true">
+                                                <i class="fa fa-shopping-bag"></i>
+                                            </span>
+                                            <h2>No products found</h2>
+                                            <p>
+                                                @if ($selectedCollectionTitle)
+                                                    There are currently no products available in {{ $selectedCollectionTitle }}.
+                                                @elseif ($selectedCategory)
+                                                    There are currently no products available in {{ $selectedCategory->category_name }}.
+                                                @else
+                                                    We couldn't find any products matching your selection.
+                                                @endif
+                                            </p>
+                                            <a href="{{ route('shop-new') }}">CONTINUE SHOPPING</a>
+                                        </li>
                                     @endforelse
                                 </ol>
                                 <button class="ais-InfiniteHits-loadMore" style="display:none">Show more
@@ -3182,27 +3290,24 @@
                             </h5>
                         </div>
                         <div class="pricemodal-content">
-                            <div class="pricemodal-top-row">
-                                <div class="card-view">
-                                    <div class="card-photo-container">
-                                        <img class="card-photo" src="" alt="Product Image" />
-                                    </div>
-                                    <div class="card-info-wrapper">
-                                        <div class="card-title"></div>
-                                        <button type="button" class="size-guide-toggle no-data"
-                                            onclick="toggleSizeGuide()">
-                                            Size Guide
-                                        </button>
-                                    </div>
+                            <div class="card-view">
+                                <div class="card-photo-container">
+                                    <img class="card-photo" src="" alt="Product Image" />
                                 </div>
-                                <div class="modal-size-chart empty"></div>
                             </div>
-                            <div class="modal-body pricemodal-body" id="shopCartOptions"></div>
-                        </div>
-                        <div class="modal-footer pricemodal-footer">
-                            <button type="button" class="btn btn-success" id="shopModalAddToCart">
-                                <i class="fa fa-spinner fa-spin" style="display:none"></i> Add to Cart
-                            </button>
+                            <div class="shop-modal-details">
+                                <div class="card-title"></div>
+                                <div class="shop-modal-price"><strong></strong><del></del></div>
+                                <button type="button" class="size-guide-toggle no-data" onclick="toggleSizeGuide()">Size Guide</button>
+                                <div class="modal-size-chart empty"></div>
+                                <div class="modal-body pricemodal-body" id="shopCartOptions"></div>
+                                <div class="modal-footer pricemodal-footer">
+                                    <button type="button" class="btn btn-success" id="shopModalAddToCart">
+                                        <i class="fa fa-spinner fa-spin" style="display:none"></i> ADD TO CART
+                                    </button>
+                                </div>
+                                <a class="shop-modal-view-details" href="#">View details</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3437,6 +3542,11 @@
 
                 document.querySelector('.pricemodal .card-photo').src = product.image;
                 document.querySelector('.pricemodal .card-title').textContent = product.title;
+                document.querySelector('.pricemodal .shop-modal-price strong').textContent = product.price || '';
+                var oldPrice = document.querySelector('.pricemodal .shop-modal-price del');
+                oldPrice.textContent = product.originalPrice || '';
+                oldPrice.style.display = product.originalPrice ? '' : 'none';
+                document.querySelector('.pricemodal .shop-modal-view-details').href = product.url || '#';
 
                 modalBody.querySelectorAll('[data-shop-color]').forEach(function(button) {
                     button.addEventListener('click', function() {
@@ -3468,6 +3578,9 @@
                         id: parseInt(button.getAttribute('data-product-id'), 10),
                         title: button.getAttribute('data-title'),
                         image: button.getAttribute('data-image'),
+                        url: button.getAttribute('data-url'),
+                        price: button.getAttribute('data-price'),
+                        originalPrice: button.getAttribute('data-original-price'),
                         stock: parseInt(button.getAttribute('data-stock'), 10) || 0,
                         colors: parseOptions(button.getAttribute('data-colors')),
                         sizes: parseOptions(button.getAttribute('data-sizes'))

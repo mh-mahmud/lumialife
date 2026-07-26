@@ -199,6 +199,20 @@
 							</div>
 
 							<div class="menu-item">
+								<a class="menu-link {{ request()->routeIs('newsletter-subscribers.*') ? 'active' : '' }}" href="{{ route('newsletter-subscribers.index') }}">
+									<span class="menu-icon">
+										<span class="svg-icon svg-icon-2">
+											<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+												<path opacity="0.3" d="M3 5C3 3.9 3.9 3 5 3H19C20.1 3 21 3.9 21 5V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V5Z" fill="white"/>
+												<path d="M4 7L12 13L20 7V9.5L12 15.5L4 9.5V7Z" fill="white"/>
+											</svg>
+										</span>
+									</span>
+									<span class="menu-title">Newsletter Subscribers</span>
+								</a>
+							</div>
+
+							<div class="menu-item">
 								<a class="menu-link {{ request()->routeIs('outlet-location-*') ? 'active' : '' }}" href="{{ route('outlet-location-list') }}">
 									<span class="menu-icon">
 										<span class="svg-icon svg-icon-2">

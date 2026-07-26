@@ -39,13 +39,26 @@ class FrontController extends Controller
             ->get(['slider_title', 'slider_image']);
 
         $newProducts = Product::where('status', 1)
+            ->whereDoesntHave('category', fn ($query) => $query->where('category_slug', 'gift-card'))
+            ->with([
+                'productColors' => fn ($query) => $query->where('product_colors.status', 1)->orderBy('product_colors.name'),
+                'productSizes' => fn ($query) => $query->where('product_sizes.status', 1)
+                    ->orderBy('product_sizes.sort_order')->orderBy('product_sizes.name'),
+            ])
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get(['id', 'name', 'slug', 'product_value', 'discount_price', 'img_path', 'stock_status', 'stock_quantity']);
 
         $trendingProducts = Product::where('status', 1)
             ->where('is_trending', 1)
+            ->whereDoesntHave('category', fn ($query) => $query->where('category_slug', 'gift-card'))
+            ->with([
+                'productColors' => fn ($query) => $query->where('product_colors.status', 1)->orderBy('product_colors.name'),
+                'productSizes' => fn ($query) => $query->where('product_sizes.status', 1)
+                    ->orderBy('product_sizes.sort_order')->orderBy('product_sizes.name'),
+            ])
             ->orderBy('created_at', 'desc')
+            ->limit(10)
             ->get(['id', 'name', 'slug', 'product_value', 'discount_price', 'img_path', 'stock_status', 'stock_quantity']);
 
         $lifestyleProducts = Product::where('status', 1)
@@ -68,10 +81,22 @@ class FrontController extends Controller
             ->whereNotNull('category_image')
             ->first(['id', 'category_name', 'category_slug', 'category_image']);
 
+        $giftCardCategory = Category::where('status', 1)
+            ->where('category_slug', 'gift-card')
+            ->first(['id', 'category_name', 'category_slug']);
+
+        $giftCardProducts = $giftCardCategory
+            ? Product::where('status', 1)
+                ->where('category_id', $giftCardCategory->id)
+                ->latest()
+                ->limit(4)
+                ->get(['id', 'name', 'slug', 'product_value', 'discount_price', 'img_path', 'stock_status', 'stock_quantity'])
+            : collect();
+
         $sliderBottomCategories = Category::where('status', 1)
             ->where('is_slider_bottom', 1)
             ->orderBy('category_name')
-            ->get(['id', 'category_name', 'category_slug']);
+            ->get(['id', 'category_name', 'category_slug', 'category_image']);
 
         $displayCategories = Category::where('status', 1)
             ->where('is_display_products', 1)
@@ -97,6 +122,8 @@ class FrontController extends Controller
             'bestDealProducts',
             'featuredCategories',
             'homePromoCategory',
+            'giftCardCategory',
+            'giftCardProducts',
             'sliderBottomCategories',
             'displayCategories',
             'homePageSetting'

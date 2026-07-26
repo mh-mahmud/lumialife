@@ -28,6 +28,7 @@ class HomePageSettingController extends Controller
     {
         $setting = HomePageSetting::firstOrCreate([]);
         $data = $request->validate([
+            'hero_video' => ['nullable', 'file', 'mimes:mp4,webm', 'max:51200'],
             'banner_section_status' => ['nullable', 'boolean'],
             'banner_one_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,avif', 'max:5120'],
             'banner_one_url' => ['nullable', 'string', 'max:1000'],
@@ -68,6 +69,12 @@ class HomePageSettingController extends Controller
             } else {
                 unset($data[$field]);
             }
+        }
+
+        if ($request->hasFile('hero_video')) {
+            $data['hero_video'] = $this->storeFile($request->file('hero_video'), $setting->hero_video);
+        } else {
+            unset($data['hero_video']);
         }
 
         foreach (['promo_left_media', 'promo_right_media'] as $field) {

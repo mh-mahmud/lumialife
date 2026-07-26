@@ -876,6 +876,8 @@
             $('.your-class').not('.slick-initialized').each(function() {
                 var $slider = $(this);
                 var itemCount = $slider.children().length;
+                var isNewArrivalSlider = $slider.hasClass("new-arrival-products-slider");
+                var desktopSlides = isNewArrivalSlider ? 4 : 6;
 
                 if (!itemCount) {
                     return;
@@ -886,8 +888,8 @@
                     arrows: itemCount > 6,
                     infinite: itemCount > 6,
                     speed: 300,
-                    slidesToShow: Math.min(6, itemCount),
-                    slidesToScroll: Math.min(6, itemCount),
+                    slidesToShow: Math.min(desktopSlides, itemCount),
+                    slidesToScroll: Math.min(desktopSlides, itemCount),
                     responsive: [{
                             breakpoint: 1200,
                             settings: {

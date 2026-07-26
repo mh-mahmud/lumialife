@@ -24,6 +24,7 @@ use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LeadsFormController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\NewsletterSubscriberController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OutletLocationController;
 use App\Http\Controllers\ProductAttributeController;
@@ -102,6 +103,8 @@ Route::get('thankyou-page', [FrontController::class, 'thankyou_page'])->name('th
 Route::get('wishlist', [FrontController::class, 'wishlist'])->name('wishlist');
 Route::get('order-tracking', [FrontController::class, 'order_tracking'])->name('order-tracking');
 Route::post('order-tracking', [FrontController::class, 'track_order'])->name('order-tracking.search')->middleware('throttle:10,1');
+Route::post('newsletter/subscribe', [NewsletterSubscriberController::class, 'store'])
+    ->middleware('throttle:10,1')->name('newsletter.subscribe');
 
 
 Route::get('/home/old', [FrontController::class, 'html'])->name('index');
@@ -405,6 +408,8 @@ Route::group(['middleware' => ['auth']], function () {
 	Route::delete('category/{id?}', [CategoryController::class, 'destroy'])->name('category-destroy')->middleware(['check-permission']);
 	Route::put('category/{id}/update-category-image', [CategoryController::class, 'updatecategoryImage'])->name('update-category-image');
 	Route::patch('category/{id}/toggle-home-promo', [CategoryController::class, 'toggleHomePromo'])->name('category-toggle-home-promo');
+	Route::get('newsletter-subscribers', [NewsletterSubscriberController::class, 'index'])->name('newsletter-subscribers.index');
+	Route::delete('newsletter-subscribers/{newsletterSubscriber}', [NewsletterSubscriberController::class, 'destroy'])->name('newsletter-subscribers.destroy');
 
 
 	// Orders Routes

@@ -30,9 +30,6 @@
 
                 <!--begin::Button-->
                 <a href="{{ route('category-create') }}" class="btn btn-sm btn-success" id="kt_toolbar_primary_button">Create Category</a>
-                &nbsp;&nbsp;
-
-
                 <!--end::Button-->
             </div>
             <!--end::Actions-->
