@@ -667,9 +667,9 @@
              height: 38px;
              position: relative;
              z-index: 2;
-             border-top: 1px solid #f2f2f2;
+             border-top: 0;
              background: #fff;
-             box-shadow: 0 4px 9px rgba(15, 23, 42, .07);
+             box-shadow: none;
          }
          .desktop-header-inner--categories,
          .desktop-header-myntra .header-nav-main,

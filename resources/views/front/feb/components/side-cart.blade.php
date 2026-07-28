@@ -69,6 +69,7 @@
     }
 
     .feb-side-cart-item {
+        position: relative;
         display: grid;
         grid-template-columns: minmax(0, 1fr) 84px;
         gap: 12px;
@@ -76,6 +77,13 @@
         padding: 12px;
         background: #fff;
         border: 1px solid #e3e6ea;
+        transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .feb-side-cart-item.is-removing {
+        opacity: .45;
+        transform: translateX(12px);
+        pointer-events: none;
     }
 
     .feb-side-cart-item-image {
@@ -108,6 +116,36 @@
         color: #111827;
         font-size: 13px;
         font-weight: 700;
+    }
+
+    .feb-side-cart-item-remove {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        z-index: 2;
+        display: inline-flex;
+        width: 25px;
+        height: 25px;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .94);
+        color: #6b7280;
+        cursor: pointer;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, .12);
+        transition: background .15s ease, color .15s ease, transform .15s ease;
+    }
+
+    .feb-side-cart-item-remove:hover {
+        transform: scale(1.06);
+        background: #fff0f0;
+        color: #e12828;
+    }
+
+    .feb-side-cart-item-remove i {
+        font-size: 12px;
+        pointer-events: none;
     }
 
     .feb-side-cart-footer {
@@ -247,6 +285,8 @@
         var footer = document.getElementById('febSideCartFooter');
         var total = document.getElementById('febSideCartTotal');
         var dataUrl = @json(route('side-cart-data'));
+        var removeUrlBase = @json(url('ajax/theme-carts'));
+        var csrfToken = document.querySelector('meta[name="csrf-token"]');
 
         function formatMoney(value) {
             return Number(value || 0).toLocaleString('en-US', {
@@ -284,6 +324,7 @@
                 if (item.size) meta += '<span>Size: ' + escapeHtml(item.size) + '</span>';
 
                 return '<article class="feb-side-cart-item">' +
+                    '<button type="button" class="feb-side-cart-item-remove" data-remove-cart-item="' + Number(item.id) + '" aria-label="Remove ' + escapeHtml(item.name) + ' from cart" title="Remove item"><i class="fa fa-trash"></i></button>' +
                     '<div><a class="feb-side-cart-item-name" href="' + escapeHtml(item.url) + '">' + escapeHtml(item.name) + '</a>' +
                     '<div class="feb-side-cart-item-meta">' + meta + '</div>' +
                     '<div class="feb-side-cart-item-price">' + window.formatStoreCurrency(item.line_total) + '</div></div>' +
@@ -293,6 +334,34 @@
 
             total.textContent = window.formatStoreCurrency(data.cart_subtotal);
             footer.hidden = false;
+        }
+
+        function removeCartItem(button) {
+            var cartId = Number(button.getAttribute('data-remove-cart-item'));
+            if (!cartId) return;
+
+            var item = button.closest('.feb-side-cart-item');
+            if (item) item.classList.add('is-removing');
+            button.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+
+            window.fetch(removeUrlBase + '/' + cartId, {
+                method: 'DELETE',
+                credentials: 'same-origin',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken ? csrfToken.getAttribute('content') : ''
+                }
+            }).then(function (response) {
+                if (!response.ok) throw new Error('Remove request failed');
+                return response.json();
+            }).then(function (data) {
+                updateBadges(Number(data.cart_count) || 0);
+                loadCart();
+            }).catch(function () {
+                if (item) item.classList.remove('is-removing');
+                button.innerHTML = '<i class="fa fa-trash"></i>';
+                button.title = 'Could not remove item. Please try again.';
+            });
         }
 
         function loadCart() {
@@ -327,6 +396,13 @@
         });
         document.querySelectorAll('[data-side-cart-close]').forEach(function (trigger) {
             trigger.addEventListener('click', closeCart);
+        });
+        itemsContainer.addEventListener('click', function (event) {
+            var removeButton = event.target.closest('[data-remove-cart-item]');
+            if (removeButton) {
+                event.preventDefault();
+                removeCartItem(removeButton);
+            }
         });
         document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') closeCart();

@@ -3,6 +3,7 @@
 @section('title', $product->name)
 
 @section('content')
+    <link rel="stylesheet" href="{{ asset('feb/css/product-details-reference.css') }}?v={{ filemtime(public_path('feb/css/product-details-reference.css')) }}">
     @php
         $productImages = array_values(array_filter([
             $product->img_path,
@@ -1184,8 +1185,15 @@
             }
         }
     </style>
-    <div class="wrapper-div">
-        <div class="container">
+    <div class="wrapper-div reference-product-page">
+        <div class="reference-product-breadcrumb">
+            <a href="{{ route('home') }}">Home</a>
+            @if($product->category)
+                <span>/</span>
+                <a href="{{ route('shop-new', ['category' => $product->category->category_slug]) }}">{{ $product->category->category_name }}</a>
+            @endif
+            <span>/</span>
+            <strong>{{ $product->name }}</strong>
         </div>
         <div class="container-fluid">
 
@@ -1364,76 +1372,6 @@
 
                             <div class="section-divider"></div>
 
-
-                            <div class="shipping-card">
-                                <div class="shipping-toggle">
-                                    <div class="label-left">
-                                        <i class="fa fa-check check" aria-hidden="true"></i>
-                                        <strong>Easy Returns & Exchange</strong>
-                                    </div>
-                                    <div class="chevron">
-                                        <i class="fa fa-angle-right" aria-hidden="true"></i>
-                                    </div>
-                                </div>
-
-
-                                <div class="shipping-highlights">
-                                    <div><i class="fa fa-check-circle"></i><span>Tell us within 7 days</span></div>
-                                    <div><i class="fa fa-check-circle"></i><span>Free return shipping*</span></div>
-                                    <div><i class="fa fa-check-circle"></i><span>Instant refund on receipt</span></div>
-                                </div>
-
-
-                                <div class="shipping-policy">
-                                    <p>Your satisfaction is our priority. If something isn't right with your order,
-                                        returning it is simple.</p>
-
-                                    <div class="policy-section">
-                                        <div class="policy-section-title">Return Window</div>
-                                        <p>Request a return within <strong>7 days</strong> of receiving your order.</p>
-                                    </div>
-
-                                    <div class="policy-section">
-                                        <div class="policy-section-title">Free Return Shipping</div>
-                                        <p>We cover return shipping for defective products, size/color mismatch, print
-                                            issues, or wrong item sent.</p>
-                                    </div>
-
-                                    <div class="policy-section">
-                                        <div class="policy-section-title">How to Return</div>
-                                        <ul>
-                                            <li>Call our hotline <a href="tel:+8809677666888">+8809677666888</a>, email
-                                                <a href="mailto:support@fabrilife.com">support@fabrilife.com</a>, or
-                                                message us on <a href="https://www.facebook.com/fabrilife"
-                                                    target="_blank">Facebook</a>
-                                            </li>
-                                            <li>Items must be unused, unwashed, with original tags and packaging</li>
-                                            <li>We'll arrange pickup for eligible returns</li>
-                                        </ul>
-                                    </div>
-
-                                    <div class="policy-section">
-                                        <div class="policy-section-title">Refunds</div>
-                                        <p>Once we receive your return, refunds are processed within <strong>1 business
-                                                day</strong> to your original payment method.</p>
-                                    </div>
-
-                                    <div class="policy-section">
-                                        <div class="policy-section-title">Our Promise</div>
-                                        <p>We stand behind our products. In rare cases, we may issue a refund without
-                                            requiring return — because your trust matters most.</p>
-                                    </div>
-
-                                    <p style="margin-top: 12px; text-align: center;"><a href="/refund-policy"
-                                            style="color: #1a73e8; text-decoration: underline;">View Full Return &
-                                            Refund Policy</a></p>
-                                </div>
-                            </div>
-
-                            <div class="section-divider"></div>
-
-
-
                             <!-- Show description from json instead of from description -->
                             <div class='self-product-description type-description' style='padding: 0 0 15px 0'>
                                 {!! $product->description !!}
@@ -1519,43 +1457,6 @@
                     </a>
 
                 </div>
-
-
-                <div class="product-related hidden-md-up">
-                    <h5 class="tiny-margin">Frequently Bought Together</h5>
-                    <hr style="margin-top: -10px; border-top: 1px solid #000;">
-                    <div class="row" style="margin: -7px; padding: 0px;">
-                        <div class="" style="display:flex">
-                            <a class="product-link"
-                                href="/product/73082-premium-designer-edition-double-pk-cotton-polo-woodlight">
-                                <img class="lazy" style="width: 170px"
-                                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
-                                    data-src="{{ asset('feb/products/66c1f1a693459-square.jpg') }}"
-                                    alt="Premium Designer Edition Double PK Cotton Polo - Woodlight" loading="lazy">
-                            </a>
-                            <div style="margin-left: 20px">
-                                <div><a class="product-link"
-                                        href="/product/73082-premium-designer-edition-double-pk-cotton-polo-woodlight">
-                                        <h6>Premium Designer Edition Double PK Cotton Polo - Woodlight</h6>
-                                </div></a>
-                                <div>
-                                    <div>
-                                        <strong>৳ 1140.00</strong> <strike>৳
-                                            1490.00</strike>
-                                    </div>
-                                    <button class="add2cartModal related_product_view btn btn-black btn-sm"
-                                        style="margin-top: 15px"
-                                        href="/product/73082-premium-designer-edition-double-pk-cotton-polo-woodlight"
-                                        data-photo="{{ asset('feb/products/66c1f1a693459-square.jpg') }}" data-productid="73082"
-                                        data-color="#ffffff"
-                                        data-title="Premium Designer Edition Double PK Cotton Polo - Woodlight"
-                                        data-sizes="[&quot;M&quot;,&quot;L&quot;,&quot;XL&quot;,&quot;2XL&quot;]"><i
-                                            class="fa fa-plus"></i>&nbsp; Add to Cart</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -1572,31 +1473,25 @@
                                 ? round((($relatedProduct->product_value - $relatedProduct->discount_price) / $relatedProduct->product_value) * 100)
                                 : 0;
                         @endphp
-                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-3 col-xs-6">
-                            <div class="home-product">
-                                @if($relatedHasDiscount)
-                                    <span class="related-discount-badge">{{ $relatedDiscountPercent }}% OFF</span>
-                                @endif
-                                <a class="product-link" href="{{ route('single-product', $relatedProduct->slug) }}">
-                                    <img class="lazy"
-                                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
-                                        data-src="{{ \App\Support\MediaStorage::url($relatedProduct->img_path, 'products') }}"
-                                        alt="{{ $relatedProduct->name }}" loading="lazy">
-                                </a>
-                                <div class="product-info">
-                                    <div class="product-name">{{ $relatedProduct->name }}</div>
-                                </div>
-                                <div class="product-price">
-                                    <div>
-                                        <strong>{{ $febCurrency->format($relatedHasDiscount ? $relatedProduct->discount_price : $relatedProduct->product_value) }}</strong>
+                        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6 col-xs-6 related-shop-item">
+                            <div class="related-shop-card">
+                                <a class="related-shop-link" href="{{ route('single-product', $relatedProduct->slug) }}">
+                                    <span class="related-shop-image">
+                                        <img class="lazy"
+                                            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
+                                            data-src="{{ \App\Support\MediaStorage::url($relatedProduct->img_path, 'products') }}"
+                                            alt="{{ $relatedProduct->name }}" loading="lazy">
+                                    </span>
+                                    <span class="related-shop-name">{{ $relatedProduct->name }}</span>
+                                    <span class="related-shop-prices">
+                                        <strong>{{ $febCurrency->format($relatedHasDiscount ? $relatedProduct->discount_price : $relatedProduct->product_value, 0) }}</strong>
                                         @if($relatedHasDiscount)
-                                            <strike>{{ $febCurrency->format($relatedProduct->product_value) }}</strike>
+                                            <del>{{ $febCurrency->format($relatedProduct->product_value, 0) }}</del>
+                                            <em>-{{ $relatedDiscountPercent }}%</em>
                                         @endif
-                                    </div>
-                                </div>
-                            </div>
+                                    </span>
+                                </a>
                             <button type="button" class="btn btn-black btn-sm related-add-cart"
-                                style="margin-top: 15px; width: 100%"
                                 data-product-id="{{ $relatedProduct->id }}"
                                 data-title="{{ $relatedProduct->name }}"
                                 data-image="{{ \App\Support\MediaStorage::url($relatedProduct->img_path, 'products') }}"
@@ -1607,6 +1502,7 @@
                                 <i class="fa fa-plus"></i>&nbsp;
                                 {{ $relatedProduct->stock_status === 'Out of Stock' || (int) $relatedProduct->stock_quantity < 1 ? 'Out of Stock' : 'Add to Cart' }}
                             </button>
+                            </div>
                         </div>
                     @empty
                         <div class="col-12 text-center">No related products available.</div>
@@ -2338,9 +2234,44 @@
                         var active = image.getAttribute('data-img_url') === imageName;
                         image.style.display = active ? 'block' : 'none';
                         image.classList.toggle('tee-ui-front', active);
+                        image.style.transformOrigin = '50% 50%';
                     });
                 });
             });
+
+            var productImageContainer = document.querySelector('.reference-product-page .product-image-container');
+            var supportsHoverZoom = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+            var hoverZoomFrame = null;
+
+            if (productImageContainer && supportsHoverZoom) {
+                productImageContainer.addEventListener('mouseenter', function() {
+                    productImageContainer.classList.add('is-hover-zooming');
+                });
+
+                productImageContainer.addEventListener('mousemove', function(event) {
+                    if (hoverZoomFrame) window.cancelAnimationFrame(hoverZoomFrame);
+
+                    hoverZoomFrame = window.requestAnimationFrame(function() {
+                        var activeImage = productImageContainer.querySelector('.product-image.tee-ui-front');
+                        if (!activeImage) return;
+
+                        var bounds = productImageContainer.getBoundingClientRect();
+                        var x = ((event.clientX - bounds.left) / bounds.width) * 100;
+                        var y = ((event.clientY - bounds.top) / bounds.height) * 100;
+                        x = Math.max(2, Math.min(98, x));
+                        y = Math.max(2, Math.min(98, y));
+                        activeImage.style.transformOrigin = x + '% ' + y + '%';
+                    });
+                });
+
+                productImageContainer.addEventListener('mouseleave', function() {
+                    if (hoverZoomFrame) window.cancelAnimationFrame(hoverZoomFrame);
+                    productImageContainer.classList.remove('is-hover-zooming');
+
+                    var activeImage = productImageContainer.querySelector('.product-image.tee-ui-front');
+                    if (activeImage) activeImage.style.transformOrigin = '50% 50%';
+                });
+            }
 
             document.querySelectorAll('.product-details .size-selector').forEach(function(sizeButton) {
                 sizeButton.addEventListener('click', function() {
@@ -2442,6 +2373,9 @@
                         if (response.data && response.data.success) {
                             updateCartCount(parseInt(response.data.cart_count, 10) || 0);
                             showCartNotification(response.data.message || 'Product added to cart.', 'success');
+                            if (typeof window.openFebSideCart === 'function') {
+                                window.openFebSideCart();
+                            }
                         }
                     }).catch(function(error) {
                         var data = error.response && error.response.data ? error.response.data : {};
@@ -2526,6 +2460,9 @@
                         updateCartCount(parseInt(response.data.cart_count, 10) || 0);
                         closeRelatedModal();
                         showCartNotification(response.data.message || 'Product added to cart.', 'success');
+                        if (typeof window.openFebSideCart === 'function') {
+                            window.openFebSideCart();
+                        }
                     }
                 }).catch(function(error) {
                     var data = error.response && error.response.data ? error.response.data : {};
