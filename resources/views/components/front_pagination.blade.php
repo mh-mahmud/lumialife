@@ -2,9 +2,9 @@
 <ul class="pagination mt-5">
     <!-- Previous Page Link -->
     @if ($paginator->onFirstPage())
-        <li class="page-item previous disabled"><span class="page-link"><i style="margin-top:45%" class="fal fa-long-arrow-left"></i></span></li>
+        <li class="page-item previous disabled"><span class="page-link" aria-disabled="true" aria-label="Previous page"><svg class="pagination-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></span></li>
     @else
-        <li class="page-item previous"><a href="{{ $paginator->previousPageUrl() }}" class="page-link"><i style="margin-top:45%" class="fal fa-long-arrow-left"></i></a></li>
+        <li class="page-item previous"><a href="{{ $paginator->previousPageUrl() }}" class="page-link" aria-label="Previous page"><svg class="pagination-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></a></li>
     @endif
 
     <!-- Pagination Elements -->
@@ -18,9 +18,9 @@
 
     <!-- Next Page Link -->
     @if ($paginator->hasMorePages())
-        <li class="page-item next"><a href="{{ $paginator->nextPageUrl() }}" class="page-link"><i style="margin-top:45%" class="fal fa-long-arrow-right"></i></a></li>
+        <li class="page-item next"><a href="{{ $paginator->nextPageUrl() }}" class="page-link" aria-label="Next page"><svg class="pagination-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
     @else
-        <li class="page-item next disabled"><span class="page-link"><i style="margin-top:45%" class="fal fa-long-arrow-right"></i></span></li>
+        <li class="page-item next disabled"><span class="page-link" aria-disabled="true" aria-label="Next page"><svg class="pagination-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></li>
     @endif
 </ul>
 @endif

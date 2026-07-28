@@ -1725,6 +1725,22 @@
             gap: 5px;
             margin: 0;
         }
+        .feb-shop-page #pagination .previous .page-link,
+        .feb-shop-page #pagination .next .page-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .feb-shop-page #pagination .pagination-arrow {
+            display: block;
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
         @media (max-width: 991px) {
             .feb-shop-page #hits .ais-InfiniteHits-list {
