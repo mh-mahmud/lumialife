@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
+@php($marketingSettings = \App\Models\Settings::first())
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -459,6 +461,10 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('feb/css/slick-theme.css') }}" />
 
 
+    {!! $marketingSettings?->meta_pixel_code !!}
+    {!! $marketingSettings?->gtm_header_code !!}
+    {!! $marketingSettings?->google_analytics_code !!}
+    {!! $marketingSettings?->custom_header_code !!}
 </head>
 
 <body>
@@ -925,6 +931,8 @@
         });
     </script>
 
+    {!! $marketingSettings?->gtm_footer_code !!}
+    {!! $marketingSettings?->custom_footer_code !!}
 </body>
 
 </html>

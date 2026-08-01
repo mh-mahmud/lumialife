@@ -109,6 +109,16 @@
 							</div>
 							@if(Auth::user()->user_type === 'admin')
 							<div class="menu-item">
+								<a class="menu-link {{ request()->routeIs('marketing.*') ? 'active' : '' }}" href="{{ route('marketing.edit') }}">
+									<span class="menu-icon">
+										<span class="svg-icon svg-icon-2">
+											<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path opacity=".3" d="M3 5h18v14H3V5Z" fill="white"/><path d="M7 15h2v2H7v-2Zm4-4h2v6h-2v-6Zm4-3h2v9h-2V8Z" fill="white"/></svg>
+										</span>
+									</span>
+									<span class="menu-title">Marketing</span>
+								</a>
+							</div>
+							<div class="menu-item">
 								<a class="menu-link {{ request()->routeIs('courier-integrations.*') ? 'active' : '' }}" href="{{ route('courier-integrations.index') }}">
 									<span class="menu-icon"><span class="svg-icon svg-icon-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path opacity=".3" d="M3 6h12v11H3V6Z" fill="black"/><path d="M15 9h3l3 4v4h-6V9ZM7 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="black"/></svg></span></span>
 									<span class="menu-title">Courier Integration</span>

@@ -626,5 +626,7 @@ else {
    <script src="{{url('/')}}/assets/theme/assets/js/meanmenu.js"></script>
    <script src="{{url('/')}}/assets/theme/assets/js/main.js"></script>
    @yield('custom_js')
+   {!! $sett?->gtm_footer_code !!}
+   {!! $sett?->custom_footer_code !!}
 </body>
 </html>

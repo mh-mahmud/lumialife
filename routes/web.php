@@ -23,6 +23,7 @@ use App\Http\Controllers\InvoiceCustomFormController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LeadsFormController;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\NewsletterSubscriberController;
 use App\Http\Controllers\OrderController;
@@ -156,6 +157,8 @@ Route::get('faq', [FrontController::class, 'faq'])->name('faq');
 
 
 Route::group(['middleware' => ['auth']], function () {
+	Route::get('/marketing', [MarketingController::class, 'edit'])->name('marketing.edit');
+	Route::put('/marketing', [MarketingController::class, 'update'])->name('marketing.update');
 	Route::get('/admin/faqs', [FaqController::class, 'index'])->name('admin-faqs.index');
 	Route::post('/admin/faqs', [FaqController::class, 'store'])->name('admin-faqs.store');
 	Route::put('/admin/faqs/{faq}', [FaqController::class, 'update'])->name('admin-faqs.update');

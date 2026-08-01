@@ -25,4 +25,8 @@
           width: 100%;
       }
    </style>
+   {!! $sett?->meta_pixel_code !!}
+   {!! $sett?->gtm_header_code !!}
+   {!! $sett?->google_analytics_code !!}
+   {!! $sett?->custom_header_code !!}
 </head>
