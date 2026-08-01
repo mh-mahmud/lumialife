@@ -108,6 +108,17 @@
 								</a>
 							</div>
 							@if(Auth::user()->user_type === 'admin')
+							<div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('reports.*') ? 'show' : '' }}">
+								<span class="menu-link">
+									<span class="menu-icon"><span class="svg-icon svg-icon-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path opacity=".3" d="M4 3h16v18H4V3Z" fill="white"/><path d="M7 15h2v3H7v-3Zm4-5h2v8h-2v-8Zm4 2h2v6h-2v-6Z" fill="white"/></svg></span></span>
+									<span class="menu-title">Reports</span><span class="menu-arrow"></span>
+								</span>
+								<div class="menu-sub menu-sub-accordion menu-active-bg">
+									@foreach(['sales' => 'Sales Report', 'product-sales' => 'Product Sales', 'customers' => 'Customer Report', 'inventory' => 'Inventory Report', 'tax' => 'Tax Report', 'profit-loss' => 'Profit/Loss', 'payments' => 'Payment Report', 'best-selling-products' => 'Best Selling Products'] as $reportKey => $reportLabel)
+										<div class="menu-item"><a class="menu-link {{ request()->route('report') === $reportKey ? 'active' : '' }}" href="{{ route('reports.show', $reportKey) }}"><span class="menu-bullet"><span class="bullet bullet-dot"></span></span><span class="menu-title">{{ $reportLabel }}</span></a></div>
+									@endforeach
+								</div>
+							</div>
 							<div class="menu-item">
 								<a class="menu-link {{ request()->routeIs('marketing.*') ? 'active' : '' }}" href="{{ route('marketing.edit') }}">
 									<span class="menu-icon">
