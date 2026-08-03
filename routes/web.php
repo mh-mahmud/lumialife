@@ -159,7 +159,7 @@ Route::get('faq', [FrontController::class, 'faq'])->name('faq');
 
 Route::group(['middleware' => ['auth']], function () {
 	Route::get('/reports/{report}', [ReportController::class, 'show'])
-		->where('report', 'sales|product-sales|customers|inventory|tax|profit-loss|payments|best-selling-products')
+		->where('report', 'orders|delivery|sales|product-sales|customers|inventory|profit-loss|payments|best-selling-products')
 		->name('reports.show');
 	Route::get('/marketing', [MarketingController::class, 'edit'])->name('marketing.edit');
 	Route::put('/marketing', [MarketingController::class, 'update'])->name('marketing.update');

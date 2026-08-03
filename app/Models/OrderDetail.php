@@ -33,6 +33,11 @@ class OrderDetail extends Model
         return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id', 'id');
+    }
+
     public function products()
     {
         return $this->hasOne(Product::class, 'id', 'product_id');

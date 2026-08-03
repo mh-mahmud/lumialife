@@ -114,7 +114,7 @@
 									<span class="menu-title">Reports</span><span class="menu-arrow"></span>
 								</span>
 								<div class="menu-sub menu-sub-accordion menu-active-bg">
-									@foreach(['sales' => 'Sales Report', 'product-sales' => 'Product Sales', 'customers' => 'Customer Report', 'inventory' => 'Inventory Report', 'tax' => 'Tax Report', 'profit-loss' => 'Profit/Loss', 'payments' => 'Payment Report', 'best-selling-products' => 'Best Selling Products'] as $reportKey => $reportLabel)
+									@foreach(['orders' => 'Order Report', 'delivery' => 'Delivery Report', 'sales' => 'Sales Report', 'product-sales' => 'Product Sales', 'customers' => 'Customer Report', 'inventory' => 'Inventory Report', 'profit-loss' => 'Profit/Loss', 'payments' => 'Payment Report', 'best-selling-products' => 'Best Selling Products'] as $reportKey => $reportLabel)
 										<div class="menu-item"><a class="menu-link {{ request()->route('report') === $reportKey ? 'active' : '' }}" href="{{ route('reports.show', $reportKey) }}"><span class="menu-bullet"><span class="bullet bullet-dot"></span></span><span class="menu-title">{{ $reportLabel }}</span></a></div>
 									@endforeach
 								</div>

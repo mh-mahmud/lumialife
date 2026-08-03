@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 
-@php($marketingSettings = \App\Models\Settings::first())
+@php
+    $marketingSettings = \App\Models\Settings::first();
+@endphp
 
 <head>
     <meta charset="UTF-8">
@@ -539,7 +541,10 @@
 
     @include('front.feb.components.footer')
 
-    @if ($febSettings?->app_promo_enabled ?? true)
+    @php
+        $showAppPromo = (bool) data_get($febSettings, 'app_promo_enabled', true);
+    @endphp
+    @if ($showAppPromo)
     <div class="modal fade" id="app-promo-modal" tabindex="-1" role="dialog" aria-labelledby="app-promo-modal-label"
         aria-hidden="true">
         <div class="modal-dialog" role="document" style="min-width: 40vw">
