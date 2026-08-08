@@ -70,58 +70,11 @@ class User extends Authenticatable
     }
 
     public function get_menu_data($type=null) {
-
-        /*$ses_name = 'user_menu_data_' . Auth::user()->role_id;
-
-        if(!empty(Session::get($ses_name))) {
-            return Session::get($ses_name);
-        }
-        else {
-            $role_data = Role::where('id', Auth::user()->role_id)->first(['name', 'permission_details']);
-            if(!empty($role_data)) {
-                Session::put($ses_name, $role_data->permission_details);
-                return $role_data->permission_details;
-            }
-        }
-
-        return null;*/
-
-
-        // new menu session store code
-        $ses_name = 'user_menu_data_' . Auth::user()->role_id;
-
-        if(!empty(Session::get($ses_name))) {
-            return Session::get($ses_name);
-        }
-        else {
-            $role_data = Role::where('id', Auth::user()->role_id)->first(['name', 'menu_details']);
-            if(!empty($role_data)) {
-                Session::put($ses_name, $role_data->menu_details);
-                return $role_data->menu_details;
-            }
-        }
-
-        return null;
+        return Role::where('id', $this->role_id)->value('menu_details');
     }
 
     public function get_permission_data($type=null) {
-
-
-        // new menu session store code
-        $ses_name = 'user_permission_data_' . Auth::user()->role_id;
-
-        if(!empty(Session::get($ses_name))) {
-            return Session::get($ses_name);
-        }
-        else {
-            $role_data = Role::where('id', Auth::user()->role_id)->first(['name', 'permission_details']);
-            if(!empty($role_data)) {
-                Session::put($ses_name, $role_data->permission_details);
-                return $role_data->permission_details;
-            }
-        }
-
-        return null;
+        return Role::where('id', $this->role_id)->value('permission_details');
     }
 
 

@@ -320,37 +320,37 @@ Route::group(['middleware' => ['auth']], function () {
 	// Product routes end
 
 	// Product color and size routes
-	Route::get('product-colors', [ProductAttributeController::class, 'colors'])->name('product-color-list');
-	Route::post('product-colors', [ProductAttributeController::class, 'storeColor'])->name('product-color-store');
-	Route::get('product-colors/{color}/edit', [ProductAttributeController::class, 'editColor'])->name('product-color-edit');
-	Route::put('product-colors/{color}', [ProductAttributeController::class, 'updateColor'])->name('product-color-update');
-	Route::delete('product-colors/{color}', [ProductAttributeController::class, 'destroyColor'])->name('product-color-destroy');
-	Route::get('product-sizes', [ProductAttributeController::class, 'sizes'])->name('product-size-list');
-	Route::post('product-sizes', [ProductAttributeController::class, 'storeSize'])->name('product-size-store');
-	Route::get('product-sizes/{size}/edit', [ProductAttributeController::class, 'editSize'])->name('product-size-edit');
-	Route::put('product-sizes/{size}', [ProductAttributeController::class, 'updateSize'])->name('product-size-update');
-	Route::delete('product-sizes/{size}', [ProductAttributeController::class, 'destroySize'])->name('product-size-destroy');
+	Route::get('product-colors', [ProductAttributeController::class, 'colors'])->name('product-color-list')->middleware(['check-permission']);
+	Route::post('product-colors', [ProductAttributeController::class, 'storeColor'])->name('product-color-store')->middleware(['check-permission']);
+	Route::get('product-colors/{color}/edit', [ProductAttributeController::class, 'editColor'])->name('product-color-edit')->middleware(['check-permission']);
+	Route::put('product-colors/{color}', [ProductAttributeController::class, 'updateColor'])->name('product-color-update')->middleware(['check-permission']);
+	Route::delete('product-colors/{color}', [ProductAttributeController::class, 'destroyColor'])->name('product-color-destroy')->middleware(['check-permission']);
+	Route::get('product-sizes', [ProductAttributeController::class, 'sizes'])->name('product-size-list')->middleware(['check-permission']);
+	Route::post('product-sizes', [ProductAttributeController::class, 'storeSize'])->name('product-size-store')->middleware(['check-permission']);
+	Route::get('product-sizes/{size}/edit', [ProductAttributeController::class, 'editSize'])->name('product-size-edit')->middleware(['check-permission']);
+	Route::put('product-sizes/{size}', [ProductAttributeController::class, 'updateSize'])->name('product-size-update')->middleware(['check-permission']);
+	Route::delete('product-sizes/{size}', [ProductAttributeController::class, 'destroySize'])->name('product-size-destroy')->middleware(['check-permission']);
 
 	// Shipping method routes
-	Route::get('shipping-methods', [ShippingMethodController::class, 'index'])->name('shipping-method-list');
-	Route::post('shipping-methods', [ShippingMethodController::class, 'store'])->name('shipping-method-store');
-	Route::get('shipping-methods/{shippingMethod}/edit', [ShippingMethodController::class, 'edit'])->name('shipping-method-edit');
-	Route::put('shipping-methods/{shippingMethod}', [ShippingMethodController::class, 'update'])->name('shipping-method-update');
-	Route::delete('shipping-methods/{shippingMethod}', [ShippingMethodController::class, 'destroy'])->name('shipping-method-destroy');
+	Route::get('shipping-methods', [ShippingMethodController::class, 'index'])->name('shipping-method-list')->middleware(['check-permission']);
+	Route::post('shipping-methods', [ShippingMethodController::class, 'store'])->name('shipping-method-store')->middleware(['check-permission']);
+	Route::get('shipping-methods/{shippingMethod}/edit', [ShippingMethodController::class, 'edit'])->name('shipping-method-edit')->middleware(['check-permission']);
+	Route::put('shipping-methods/{shippingMethod}', [ShippingMethodController::class, 'update'])->name('shipping-method-update')->middleware(['check-permission']);
+	Route::delete('shipping-methods/{shippingMethod}', [ShippingMethodController::class, 'destroy'])->name('shipping-method-destroy')->middleware(['check-permission']);
 
 	// Outlet location routes
-	Route::get('outlet-locations', [OutletLocationController::class, 'index'])->name('outlet-location-list');
-	Route::get('outlet-locations/create', [OutletLocationController::class, 'create'])->name('outlet-location-create');
-	Route::post('outlet-locations', [OutletLocationController::class, 'store'])->name('outlet-location-store');
-	Route::get('outlet-locations/{outletLocation}/edit', [OutletLocationController::class, 'edit'])->name('outlet-location-edit');
-	Route::put('outlet-locations/{outletLocation}', [OutletLocationController::class, 'update'])->name('outlet-location-update');
-	Route::delete('outlet-locations/{outletLocation}', [OutletLocationController::class, 'destroy'])->name('outlet-location-destroy');
-	Route::post('outlet-locations/banner', [OutletLocationController::class, 'updateBanner'])->name('outlet-location-banner');
+	Route::get('outlet-locations', [OutletLocationController::class, 'index'])->name('outlet-location-list')->middleware(['check-permission']);
+	Route::get('outlet-locations/create', [OutletLocationController::class, 'create'])->name('outlet-location-create')->middleware(['check-permission']);
+	Route::post('outlet-locations', [OutletLocationController::class, 'store'])->name('outlet-location-store')->middleware(['check-permission']);
+	Route::get('outlet-locations/{outletLocation}/edit', [OutletLocationController::class, 'edit'])->name('outlet-location-edit')->middleware(['check-permission']);
+	Route::put('outlet-locations/{outletLocation}', [OutletLocationController::class, 'update'])->name('outlet-location-update')->middleware(['check-permission']);
+	Route::delete('outlet-locations/{outletLocation}', [OutletLocationController::class, 'destroy'])->name('outlet-location-destroy')->middleware(['check-permission']);
+	Route::post('outlet-locations/banner', [OutletLocationController::class, 'updateBanner'])->name('outlet-location-banner')->middleware(['check-permission']);
 
 	// Home page setting routes
-	Route::get('home-page-setting', [HomePageSettingController::class, 'edit'])->name('home-page-setting-edit');
-	Route::put('home-page-setting', [HomePageSettingController::class, 'update'])->name('home-page-setting-update');
-	Route::delete('home-page-setting/partner-logo', [HomePageSettingController::class, 'deletePartnerLogo'])->name('home-page-setting-partner-logo-delete');
+	Route::get('home-page-setting', [HomePageSettingController::class, 'edit'])->name('home-page-setting-edit')->middleware(['check-permission']);
+	Route::put('home-page-setting', [HomePageSettingController::class, 'update'])->name('home-page-setting-update')->middleware(['check-permission']);
+	Route::delete('home-page-setting/partner-logo', [HomePageSettingController::class, 'deletePartnerLogo'])->name('home-page-setting-partner-logo-delete')->middleware(['check-permission']);
 
 
 
@@ -415,12 +415,14 @@ Route::group(['middleware' => ['auth']], function () {
 	Route::delete('category/{id?}', [CategoryController::class, 'destroy'])->name('category-destroy')->middleware(['check-permission']);
 	Route::put('category/{id}/update-category-image', [CategoryController::class, 'updatecategoryImage'])->name('update-category-image');
 	Route::patch('category/{id}/toggle-home-promo', [CategoryController::class, 'toggleHomePromo'])->name('category-toggle-home-promo');
-	Route::get('newsletter-subscribers', [NewsletterSubscriberController::class, 'index'])->name('newsletter-subscribers.index');
-	Route::delete('newsletter-subscribers/{newsletterSubscriber}', [NewsletterSubscriberController::class, 'destroy'])->name('newsletter-subscribers.destroy');
+	Route::get('newsletter-subscribers', [NewsletterSubscriberController::class, 'index'])->name('newsletter-subscribers.index')->middleware(['check-permission']);
+	Route::delete('newsletter-subscribers/{newsletterSubscriber}', [NewsletterSubscriberController::class, 'destroy'])->name('newsletter-subscribers.destroy')->middleware(['check-permission']);
 
 
 	// Orders Routes
 	Route::get('/orders', [OrderController::class, 'index'])->name('orders-index')->middleware(['check-permission']);
+	Route::get('/my-orders', [OrderController::class, 'myOrders'])->name('agent-my-orders')->middleware(['check-permission']);
+	Route::post('/orders/claim', [OrderController::class, 'claimOrders'])->name('orders-claim')->middleware(['check-permission']);
 	Route::get('/orders/create', [OrderController::class, 'create'])->name('orders-create')->middleware(['check-permission']);
 	Route::post('/orders', [OrderController::class, 'store'])->name('orders-store');
 	Route::get('/orders/{id}/invoice', [OrderController::class, 'invoice'])->name('orders-invoice');

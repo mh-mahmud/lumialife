@@ -152,7 +152,7 @@
 
                                     <!-- Start Form-->
 
-                                    <form class="g-form w-100" action="{{ route('role-update') }}"  enctype="multipart/form-data" method="POST">
+                                    <form class="g-form w-100 permission-validation-form" action="{{ route('role-update') }}" enctype="multipart/form-data" method="POST" data-require-permission novalidate>
                                          @csrf
                                         <div class="row">
                                             <input type="hidden" name="id" value="{{ $role_data->id }}">
@@ -161,7 +161,8 @@
                                                 <div class="fv-row mb-3">
 
                                                     <label class="form-label fw-bolder text-dark">Role Name</label>
-                                                    <input class="form-control form-control-sm form-control-solid" value="{{ $role_data->name }}" type="text" name="role_name" autocomplete="off"/>
+                                                    <input class="form-control form-control-sm form-control-solid" value="{{ old('role_name', $role_data->name) }}" type="text" name="role_name" maxlength="191" autocomplete="off" required />
+                                                    <div class="invalid-feedback">Role name is required.</div>
                                                     @if ($errors->has('role_name'))
                                                         <span class="text-danger">{{ $errors->first('role_name') }}</span>
                                                     @endif
@@ -188,6 +189,7 @@
 
                                         </div>
                                         <!--End Row-->
+                                        <div class="alert alert-danger d-none" data-permission-error>Please select at least one permission.</div>
                                       <div class="card-footer d-flex justify-content-end py-6 px-9">
                                             <button type="submit" class="btn btn-primary" id="kt_account_profile_details_submit">Submit
                                             </button>
@@ -214,4 +216,5 @@
             <!--end::Content-->
 
 
+<script src="{{ asset('assets/js/permission-role-validation.js') }}"></script>
 @endsection

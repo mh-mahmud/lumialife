@@ -13,6 +13,8 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 class UserService {
 
@@ -76,7 +78,80 @@ class UserService {
     }
 
     public function get_all_permission() {
-        return Menu::paginate(config('constants.ROW_PER_PAGE'));
+        return Menu::with('parent')
+            ->orderByRaw('parent_id IS NULL DESC')
+            ->orderBy('parent_id')
+            ->orderBy('name')
+            ->paginate(config('constants.ROW_PER_PAGE'));
+    }
+
+    public function syncRoutePermissions(): int
+    {
+        $fallbackParent = Menu::firstOrCreate(
+            ['parent_id' => null, 'sub_name' => 'route-permissions'],
+            ['name' => 'Route Permissions', 'show_in_menu' => 0, 'status' => 1]
+        );
+        $ordersParent = Menu::firstOrCreate(
+            ['parent_id' => null, 'name' => 'Orders'],
+            ['sub_name' => 'orders', 'show_in_menu' => 1, 'status' => 1]
+        );
+
+        $moduleParents = collect([
+            'home-page-setting-' => 'Home Page Setting',
+            'newsletter-subscribers.' => 'Newsletter Subscribers',
+            'outlet-location-' => 'Outlet Locations',
+            'product-color-' => 'Product Attributes',
+            'product-size-' => 'Product Attributes',
+            'shipping-method-' => 'Shipping',
+        ])->mapWithKeys(function ($label, $prefix) {
+            return [$prefix => Menu::firstOrCreate(
+                ['parent_id' => null, 'name' => $label],
+                ['sub_name' => Str::slug($label), 'show_in_menu' => 0, 'status' => 1]
+            )];
+        });
+
+        $created = 0;
+
+        foreach (Route::getRoutes() as $route) {
+            $name = $route->getName();
+            $middleware = $route->middleware();
+            $excluded = $route->excludedMiddleware();
+
+            if (!$name
+                || !in_array('check-permission', $middleware, true)
+                || in_array('check-permission', $excluded, true)) {
+                continue;
+            }
+
+            $parent = str_starts_with($name, 'orders-') ? $ordersParent : $fallbackParent;
+            foreach ($moduleParents as $prefix => $moduleParent) {
+                if (str_starts_with($name, $prefix)) {
+                    $parent = $moduleParent;
+                    break;
+                }
+            }
+            $permission = Menu::where('sub_name', $name)->first();
+
+            if ($permission) {
+                if ($permission->parent_id !== $parent->id) {
+                    $permission->parent_id = $parent->id;
+                    $permission->save();
+                }
+                continue;
+            }
+
+            Menu::create([
+                'parent_id' => $parent->id,
+                'name' => Str::headline(str_replace(['.', '-'], ' ', $name)),
+                'sub_name' => $name,
+                'show_in_menu' => $name === 'orders-index' ? 1 : 0,
+                'status' => 1,
+            ]);
+
+            $created++;
+        }
+
+        return $created;
     }
 
     public function get_parent_list() {
@@ -347,9 +422,9 @@ class UserService {
         //dd($query);die();
         $query->where(function ($q) use ($searchTerm) {
             $q->where('name', 'LIKE', '%' . $searchTerm . '%')
-             ;
+                ->orWhere('sub_name', 'LIKE', '%' . $searchTerm . '%');
         });
 
-        return $query->paginate(config('constants.ROW_PER_PAGE'));
+        return $query->with('parent')->paginate(config('constants.ROW_PER_PAGE'));
     }
 }

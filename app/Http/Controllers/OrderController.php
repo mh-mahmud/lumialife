@@ -13,6 +13,7 @@ use App\Models\OrderDetail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\Helper;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -25,9 +26,44 @@ class OrderController extends Controller
 
     public function index()
     {
-        $orders = $this->orderService->getAllOrders();
+        $isAgent = Auth::user()->user_type === 'agent';
+        $orders = $isAgent
+            ? $this->orderService->getUnassignedOrders()
+            : $this->orderService->getAllOrders();
         $agents = Agent::where('status', 1)->orderBy('first_name')->orderBy('last_name')->get();
-        return view('orders.index', compact('orders', 'agents'));
+        $pageMode = $isAgent ? 'unassigned' : 'all';
+        return view('orders.index', compact('orders', 'agents', 'pageMode'));
+    }
+
+    public function myOrders()
+    {
+        abort_unless(Auth::user()->user_type === 'agent', 403);
+
+        $agent = $this->currentAgent();
+        $orders = $this->orderService->getOrdersForAgent($agent->agent_id);
+        $agents = collect();
+        $pageMode = 'mine';
+
+        return view('orders.index', compact('orders', 'agents', 'pageMode'));
+    }
+
+    public function claimOrders(Request $request)
+    {
+        abort_unless(Auth::user()->user_type === 'agent', 403);
+
+        $validated = $request->validate([
+            'order_ids' => ['required', 'array', 'min:1'],
+            'order_ids.*' => ['integer', 'exists:orders,id'],
+            'return_to' => ['nullable', 'in:dashboard,my-orders'],
+        ], ['order_ids.required' => 'Please select at least one order.']);
+
+        $agent = $this->currentAgent();
+        $updated = Order::whereIn('id', $validated['order_ids'])
+            ->whereNull('assigned_agent_id')
+            ->update(['assigned_agent_id' => $agent->agent_id]);
+
+        return redirect()->route(($validated['return_to'] ?? null) === 'dashboard' ? 'dashboard' : 'agent-my-orders')
+            ->with('success', $updated.' order(s) assigned to you successfully.');
     }
 
     public function create()
@@ -71,6 +107,7 @@ class OrderController extends Controller
 
     public function show($id)
     {
+        $this->ensureAgentCanManageOrder($id);
         $data = $this->orderService->getOrder($id);
         $products = Product::orderBy('name')->get(['id', 'name', 'product_value', 'discount_price', 'product_code', 'img_path']);
         return view('orders.show', [
@@ -83,6 +120,7 @@ class OrderController extends Controller
 
     public function invoice($id)
     {
+        $this->ensureAgentCanManageOrder($id);
         $data = $this->orderService->getOrder($id);
 
         abort_if(! $data['order'], 404);
@@ -95,6 +133,7 @@ class OrderController extends Controller
 
     public function addOrderItem(Request $request, $id)
     {
+        $this->ensureAgentCanManageOrder($id);
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1|max:9999',
@@ -136,6 +175,7 @@ class OrderController extends Controller
 
     public function updateOrderItem(Request $request, $id, $detailId)
     {
+        $this->ensureAgentCanManageOrder($id);
         $validated = $request->validate([
             'quantity' => 'required|integer|min:1|max:9999',
         ]);
@@ -155,6 +195,7 @@ class OrderController extends Controller
 
     public function deleteOrderItem($id, $detailId)
     {
+        $this->ensureAgentCanManageOrder($id);
         $order = Order::findOrFail($id);
         $item = OrderDetail::where('order_id', $order->id)->findOrFail($detailId);
 
@@ -201,18 +242,21 @@ class OrderController extends Controller
 
     public function edit($id)
     {
+        $this->ensureAgentCanManageOrder($id);
         $order = $this->orderService->getOrder($id);
         return view('orders.edit', compact('order'));
     }
 
     public function update(Request $request, $id)
     {
+        $this->ensureAgentCanManageOrder($id);
         $this->orderService->updateOrder($id, $request);
         return redirect()->back()->with('success', 'Order updated successfully!');
     }
 
     public function updateCustomerDelivery(Request $request, $id)
     {
+        $this->ensureAgentCanManageOrder($id);
         $validated = $request->validate([
             'first_name' => 'required|string|max:100',
             'last_name' => 'nullable|string|max:100',
@@ -242,6 +286,7 @@ class OrderController extends Controller
 
     public function destroy($id)
     {
+        $this->ensureAgentCanManageOrder($id);
         try {
             $this->orderService->deleteOrder($id);
             return redirect()->route('orders-index')->with('success', 'Order deleted successfully!');
@@ -266,6 +311,7 @@ class OrderController extends Controller
 
     public function assignAgent(Request $request)
     {
+        abort_unless(Auth::user()->user_type === 'admin', 403);
         $validated = $request->validate([
             'agent_id' => 'required|exists:agents,agent_id',
             'order_ids' => 'required|array|min:1',
@@ -278,6 +324,28 @@ class OrderController extends Controller
             ->update(['assigned_agent_id' => $validated['agent_id']]);
 
         return redirect()->back()->with('success', $updated.' order(s) assigned successfully.');
+    }
+
+    private function currentAgent(): Agent
+    {
+        $agent = Agent::where('user_id', Auth::id())->where('status', 1)->first();
+        abort_unless($agent, 403, 'No active agent profile is linked to this account.');
+
+        return $agent;
+    }
+
+    private function ensureAgentCanManageOrder($orderId): void
+    {
+        if (Auth::user()->user_type !== 'agent') {
+            return;
+        }
+
+        $agent = $this->currentAgent();
+        abort_unless(
+            Order::whereKey($orderId)->where('assigned_agent_id', $agent->agent_id)->exists(),
+            403,
+            'This order is not assigned to you.'
+        );
     }
 
     

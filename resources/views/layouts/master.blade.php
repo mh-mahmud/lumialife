@@ -97,6 +97,20 @@
 									<span class="menu-title">Home</span>
 								</a>
 							</div>
+							@if(Auth::user()->user_type === 'agent')
+							<div class="menu-item">
+								<a class="menu-link {{ request()->routeIs('orders-index') ? 'active' : '' }}" href="{{ route('orders-index') }}">
+									<span class="menu-icon"><span class="svg-icon svg-icon-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path opacity=".3" d="M4 4h16v16H4V4Z" fill="black"/><path d="M7 8h10v2H7V8Zm0 4h10v2H7v-2Zm0 4h6v2H7v-2Z" fill="black"/></svg></span></span>
+									<span class="menu-title">Unassigned Orders</span>
+								</a>
+							</div>
+							<div class="menu-item">
+								<a class="menu-link {{ request()->routeIs('agent-my-orders') ? 'active' : '' }}" href="{{ route('agent-my-orders') }}">
+									<span class="menu-icon"><span class="svg-icon svg-icon-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path opacity=".3" d="M5 3h14v18H5V3Z" fill="black"/><path d="m8 12 2.5 2.5L16 9l1.5 1.5-7 7L6.5 13.5 8 12Z" fill="black"/></svg></span></span>
+									<span class="menu-title">My Order List</span>
+								</a>
+							</div>
+							@endif
 							<div class="menu-item">
 								<a class="menu-link {{ request()->routeIs('agents-*') ? 'active' : '' }}" href="{{ route('agents-index') }}">
 									<span class="menu-icon">
@@ -205,6 +219,7 @@
 
 							@endif
 
+							@if(Auth::user()->user_type === 'admin' || Auth::user()->hasPermission('home-page-setting-edit'))
 							<div class="menu-item">
 								<a class="menu-link {{ request()->routeIs('home-page-setting-*') ? 'active' : '' }}" href="{{ route('home-page-setting-edit') }}">
 									<span class="menu-icon">
@@ -218,7 +233,9 @@
 									<span class="menu-title">Home Page Setting</span>
 								</a>
 							</div>
+							@endif
 
+							@if(Auth::user()->user_type === 'admin' || Auth::user()->hasPermission('newsletter-subscribers.index'))
 							<div class="menu-item">
 								<a class="menu-link {{ request()->routeIs('newsletter-subscribers.*') ? 'active' : '' }}" href="{{ route('newsletter-subscribers.index') }}">
 									<span class="menu-icon">
@@ -232,7 +249,9 @@
 									<span class="menu-title">Newsletter Subscribers</span>
 								</a>
 							</div>
+							@endif
 
+							@if(Auth::user()->user_type === 'admin' || Auth::user()->hasPermission('outlet-location-list'))
 							<div class="menu-item">
 								<a class="menu-link {{ request()->routeIs('outlet-location-*') ? 'active' : '' }}" href="{{ route('outlet-location-list') }}">
 									<span class="menu-icon">
@@ -246,7 +265,9 @@
 									<span class="menu-title">Outlet Locations</span>
 								</a>
 							</div>
+							@endif
 
+							@if(Auth::user()->user_type === 'admin' || Auth::user()->hasPermission('product-color-list') || Auth::user()->hasPermission('product-size-list'))
 							<div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('product-color-*', 'product-size-*') ? 'show' : '' }}">
 								<span class="menu-link">
 									<span class="menu-icon">
@@ -261,21 +282,27 @@
 									<span class="menu-arrow"></span>
 								</span>
 								<div class="menu-sub menu-sub-accordion menu-active-bg">
+									@if(Auth::user()->user_type === 'admin' || Auth::user()->hasPermission('product-color-list'))
 									<div class="menu-item">
 										<a class="menu-link {{ request()->routeIs('product-color-*') ? 'active' : '' }}" href="{{ route('product-color-list') }}">
 											<span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
 											<span class="menu-title">Colors</span>
 										</a>
 									</div>
+									@endif
+									@if(Auth::user()->user_type === 'admin' || Auth::user()->hasPermission('product-size-list'))
 									<div class="menu-item">
 										<a class="menu-link {{ request()->routeIs('product-size-*') ? 'active' : '' }}" href="{{ route('product-size-list') }}">
 											<span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
 											<span class="menu-title">Sizes</span>
 										</a>
 									</div>
+									@endif
 								</div>
 							</div>
+							@endif
 
+							@if(Auth::user()->user_type === 'admin' || Auth::user()->hasPermission('shipping-method-list'))
 							<div class="menu-item">
 								<a class="menu-link {{ request()->routeIs('shipping-method-*') ? 'active' : '' }}" href="{{ route('shipping-method-list') }}">
 									<span class="menu-icon">
@@ -289,6 +316,7 @@
 									<span class="menu-title">Shipping</span>
 								</a>
 							</div>
+							@endif
 
 						</div>
 						<!--end::Menu-->

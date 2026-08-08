@@ -93,6 +93,7 @@ class UserController extends Controller
     // permission data
     public function permission_index() {
     	$data = [];
+        $data['syncedCount'] = $this->service->syncRoutePermissions();
     	$data['users'] = $this->service->get_all_permission();
     	return view('users.permission_list', $data);
     }
@@ -107,8 +108,8 @@ class UserController extends Controller
     {
         
         $request->validate([
-            'name' => 'required|unique:permissions',
-            // 'slug' => 'required|unique:permissions',
+            'name' => 'required|string|max:191',
+            'slug' => 'required|string|max:191|unique:menus,sub_name',
             'show_in_menu' => 'required'
         ]);
 
@@ -123,7 +124,8 @@ class UserController extends Controller
 
     public function permission_update(Request $request) {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|string|max:191',
+            'slug' => 'required|string|max:191|unique:menus,sub_name,' . $request->id,
             'show_in_menu' => 'required'
         ]);
         $data = $this->service->edit_permission($request);
@@ -173,6 +175,7 @@ class UserController extends Controller
 
     public function role_create() {
     	$data = [];
+        $this->service->syncRoutePermissions();
     	$data['menus'] = $this->service->menu_list();
     	return view('users.create_role', $data);
     }
@@ -194,6 +197,7 @@ class UserController extends Controller
     public function role_edit($id) {
         $data = [];
         $ids = [];
+        $this->service->syncRoutePermissions();
         $data['menus'] = $this->service->menu_list();
         $data['role_data'] = $this->service->get_role_data($id);
         $permissions = json_decode($data['role_data']->permission_ids);

@@ -56,7 +56,7 @@
 
                                     <!-- Start Form-->
 
-                                    <form class="g-form w-100" action="{{ route('permission.update') }}"  enctype="multipart/form-data" method="POST">
+                                    <form class="g-form w-100 permission-validation-form" action="{{ route('permission.update') }}" enctype="multipart/form-data" method="POST" novalidate>
                                          @csrf
                                         <div class="row">
                                             <input type="hidden" name="id" value="{{ $data->id }}">
@@ -78,7 +78,8 @@
                                                 <div class="fv-row mb-3">
                                                     <label class="form-label fw-bolder text-dark">
                                                         Permision Name</label>
-                                                    <input class="form-control form-control-sm form-control-solid" type="text" value="{{ $data->name }}" name="name" autocomplete="off"/>
+                                                    <input class="form-control form-control-sm form-control-solid" type="text" value="{{ old('name', $data->name) }}" name="name" maxlength="191" autocomplete="off" required />
+                                                    <div class="invalid-feedback">Permission name is required.</div>
                                                     @if ($errors->has('name'))
                                                         <span class="text-danger">{{ $errors->first('name') }}</span>
                                                     @endif
@@ -89,7 +90,8 @@
                                                 <div class="fv-row mb-3">
                                                     <label class="form-label fw-bolder text-dark">
                                                         Permision Slug</label>
-                                                    <input class="form-control form-control-sm form-control-solid" value="{{ $data->sub_name }}" type="text" name="slug" autocomplete="off"/>
+                                                    <input class="form-control form-control-sm form-control-solid" value="{{ old('slug', $data->sub_name) }}" type="text" name="slug" maxlength="191" pattern="[A-Za-z0-9._-]+" autocomplete="off" required />
+                                                    <div class="invalid-feedback">Use a valid route name containing letters, numbers, dot, dash or underscore.</div>
                                                     @if ($errors->has('slug'))
                                                         <span class="text-danger">{{ $errors->first('slug') }}</span>
                                                     @endif
@@ -99,12 +101,13 @@
                                             <div class="col-md-6">
                                                 <div class="fv-row mb-3">
                                                     <label class="form-label fw-bolder text-dark">Show in Menu</label>
-                                                    <select class=" form-control form-control-sm form-control-solid" name="show_in_menu"
-                                                            aria-label="Default select example">
+                                                    <select class="form-control form-control-sm form-control-solid" name="show_in_menu"
+                                                            aria-label="Show in menu" required>
                                                             <option value="">Select option</option>
                                                             <option @if($data->show_in_menu=='1') selected  @endif value="1">Yes</option>
                                                             <option @if($data->show_in_menu=='0') selected  @endif value="0">No</option>
                                                     </select>
+                                                    <div class="invalid-feedback">Please select whether this permission appears in the menu.</div>
                                                 </div>
                                             </div>
 
@@ -140,4 +143,5 @@
             <!--end::Content-->
 
 
+<script src="{{ asset('assets/js/permission-role-validation.js') }}"></script>
 @endsection

@@ -165,7 +165,8 @@ use Carbon\Carbon;
         <div data-kt-swapper="true" data-kt-swapper-mode="prepend"
             data-kt-swapper-parent="{default: '#kt_content_container', 'lg': '#kt_toolbar_container'}"
             class="page-title d-flex align-items-center flex-wrap me-3 mb-5 mb-lg-0">
-            <h1 class="d-flex align-items-center text-dark fw-bolder fs-3 my-1">Orders
+            <h1 class="d-flex align-items-center text-dark fw-bolder fs-3 my-1">
+                {{ ($pageMode ?? 'all') === 'mine' ? 'My Order List' : (($pageMode ?? 'all') === 'unassigned' ? 'Unassigned Orders' : 'Orders') }}
                 <span class="h-20px border-gray-200 border-start ms-3 mx-2"></span>
                 <small class="text-muted fs-7 fw-bold my-1 ms-1">List</small>
             </h1>
@@ -179,7 +180,20 @@ use Carbon\Carbon;
 </div>
 
 <div class="container-fluid orders-page">
+    @php
+        $isAgent = Auth::user()->user_type === 'agent';
+        $isMyOrders = ($pageMode ?? 'all') === 'mine';
+        $isUnassignedOrders = ($pageMode ?? 'all') === 'unassigned';
+        $canAssignOrders = Auth::user()->user_type === 'admin';
+        $canSelfAssign = $isAgent && $isUnassignedOrders;
+        $canSelectOrders = $canAssignOrders || $canSelfAssign;
+    @endphp
+    @if($canAssignOrders)
     <form id="assignAgentForm" action="{{ route('orders-assign-agent') }}" method="POST">@csrf</form>
+    @endif
+    @if($canSelfAssign)
+    <form id="claimOrderForm" action="{{ route('orders-claim') }}" method="POST">@csrf</form>
+    @endif
     @if (session('success'))
     <script>
         Swal.fire({
@@ -204,11 +218,21 @@ use Carbon\Carbon;
     </script>
     @endif
 
+    @if ($errors->any())
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Assignment failed',
+            text: @json($errors->first())
+        });
+    </script>
+    @endif
+
     <div class="card mt-4 border-0 shadow-sm">
         <div class="card-header border-0 bg-transparent p-4 pb-2">
             <div class="d-flex flex-wrap align-items-center justify-content-between w-100 gap-3">
                 <div>
-                    <h3 class="fw-bolder mb-1">Orders</h3>
+                    <h3 class="fw-bolder mb-1">{{ $isMyOrders ? 'My Order List' : ($isUnassignedOrders ? 'Unassigned Orders' : 'Orders') }}</h3>
                     <div class="text-muted fw-bold fs-8">
                         Showing {{ $orders->firstItem() ?? 0 }} to {{ $orders->lastItem() ?? 0 }} of {{ $orders->total() }} entries
                         @if(request('search'))
@@ -218,15 +242,18 @@ use Carbon\Carbon;
                     </div>
                 </div>
 
+                @unless($isAgent)
                 <form action="{{ route('orders-search') }}" method="POST" class="d-flex">
                     @csrf
                     <input type="text" name="search" class="form-control form-control-sm form-control-solid w-250px"
                         value="{{ request('search') }}" placeholder="Search...">
                 </form>
+                @endunless
             </div>
 
             <div class="d-flex flex-wrap align-items-center justify-content-between w-100 mt-3 gap-3">
                 <div class="d-flex flex-wrap align-items-center orders-toolbar">
+                    @if($canAssignOrders)
                     <select name="agent_id" form="assignAgentForm" class="form-select form-select-sm form-select-solid w-200px" required>
                         <option value="">Select Agent</option>
                         @foreach($agents as $agent)
@@ -234,6 +261,11 @@ use Carbon\Carbon;
                         @endforeach
                     </select>
                     <button type="submit" form="assignAgentForm" class="btn btn-sm btn-success">Assign Agent</button>
+                    @endif
+                    @if($canSelfAssign)
+                    <button type="submit" form="claimOrderForm" class="btn btn-sm btn-success">Assign Selected to Me</button>
+                    @endif
+                    @unless($isAgent)
                     <select id="courierProvider" class="form-select form-select-sm form-select-solid w-160px">
                         <option value="steadfast">SteadFast</option>
                         <option value="redx" disabled>RedX — Coming soon</option>
@@ -241,6 +273,7 @@ use Carbon\Carbon;
                     </select>
                     <button type="button" id="bulkCourierSend" class="btn btn-sm btn-warning">Send to Courier</button>
                     <a href="{{ route('orders-create') }}" class="btn btn-sm btn-primary">Create Order</a>
+                    @endunless
                 </div>
 
             </div>
@@ -252,7 +285,9 @@ use Carbon\Carbon;
                 <table class="table orders-table table-row-bordered mb-0">
                     <thead>
                         <tr>
+                            @if($canSelectOrders)
                             <th class="ps-4 w-30px"><input type="checkbox" class="form-check-input order-select-all"></th>
+                            @endif
                             <th>Invoice no</th>
                             <th>Assigned by staff</th>
                             <th>Source</th>
@@ -271,13 +306,17 @@ use Carbon\Carbon;
                             $source = $order->user_id ? 'New Customer' : 'previous customer';
                             $customerName = trim($order->first_name . ' ' . $order->last_name);
                             $address = collect([$order->shipping_address, $order->city, $order->state, $order->zip])->filter()->implode(', ');
-                            $canDelete = strcasecmp(trim((string) $order->order_status), 'Pending') === 0;
+                            $canDelete = !$isAgent && strcasecmp(trim((string) $order->order_status), 'Pending') === 0;
                         @endphp
                         <tr>
+                            @if($canSelectOrders)
                             <td class="ps-4">
                                 <span class="text-muted me-2">::</span>
-                                <input type="checkbox" name="order_ids[]" value="{{ $order->lukaku }}" form="assignAgentForm" class="form-check-input order-checkbox">
+                                <input type="checkbox" name="order_ids[]" value="{{ $order->lukaku }}"
+                                    form="{{ $canSelfAssign ? 'claimOrderForm' : 'assignAgentForm' }}"
+                                    class="form-check-input order-checkbox">
                             </td>
+                            @endif
                             <td><span class="order-id-badge">{{ $order->custom_order_id }}</span></td>
                             <td>{{ $order->assigned_staff ?: '-' }}</td>
                             <td><span class="order-source-badge">{{ $source }}</span></td>
@@ -318,6 +357,7 @@ use Carbon\Carbon;
                             </td>
                             <td>
                                 <div class="order-action-links">
+                                    @if(!$isUnassignedOrders)
                                     <a href="{{ route('orders-show', $order->lukaku) }}">Preview</a>
                                     @if($canDelete)
                                         <form action="{{ route('orders-destroy', $order->lukaku) }}" method="POST" class="d-inline">
@@ -325,12 +365,17 @@ use Carbon\Carbon;
                                             @method('DELETE')
                                             <button type="submit" onclick="return confirmDelete()">Delete</button>
                                         </form>
-                                    @else
+                                    @elseif(!$isAgent)
                                         <button type="button" disabled title="Only orders with Pending order status can be deleted" style="opacity:.45;cursor:not-allowed">Delete</button>
                                     @endif
-                                    <button type="button" class="fraud-check-btn" data-order-id="{{ $order->lukaku }}" data-phone="{{ $order->order_phone_number }}">Fraud Check</button>
-                                    <button type="button" class="single-courier-send" data-order-id="{{ $order->lukaku }}" @disabled($order->steadfast_consignment_id)>{{ $order->steadfast_consignment_id ? 'Courier Sent' : 'Send Courier' }}</button>
-                                    <span>Courier Status</span>
+                                    @unless($isAgent)
+                                        <button type="button" class="fraud-check-btn" data-order-id="{{ $order->lukaku }}" data-phone="{{ $order->order_phone_number }}">Fraud Check</button>
+                                        <button type="button" class="single-courier-send" data-order-id="{{ $order->lukaku }}" @disabled($order->steadfast_consignment_id)>{{ $order->steadfast_consignment_id ? 'Courier Sent' : 'Send Courier' }}</button>
+                                        <span>Courier Status</span>
+                                    @endunless
+                                    @else
+                                    <span class="text-muted">Select this order and assign it to yourself</span>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -338,7 +383,9 @@ use Carbon\Carbon;
                     </tbody>
                     <tfoot>
                         <tr>
+                            @if($canSelectOrders)
                             <th class="ps-4"><input type="checkbox" class="form-check-input order-select-all"></th>
+                            @endif
                             <th>Invoice no</th>
                             <th>Assigned by staff</th>
                             <th>Source</th>
@@ -355,12 +402,14 @@ use Carbon\Carbon;
                 @endif
             </div>
 
+            @unless($isAgent)
             <div class="d-flex flex-wrap align-items-center orders-bottom-tools">
                 <button type="button" class="btn btn-sm btn-light">Print invoice</button>
                 <button type="button" class="btn btn-sm btn-light">Print sticker</button>
                 <button type="button" class="btn btn-sm btn-light">Download product image</button>
                 <button type="button" class="btn btn-sm btn-warning">Publish For Shipping</button>
             </div>
+            @endunless
         </div>
     </div>
 
@@ -403,12 +452,24 @@ use Carbon\Carbon;
         });
     });
 
-    document.getElementById('assignAgentForm').addEventListener('submit', function (event) {
-        if (!document.querySelector('.order-checkbox:checked')) {
-            event.preventDefault();
-            alert('Please select at least one order.');
-        }
-    });
+    const assignAgentForm = document.getElementById('assignAgentForm');
+    if (assignAgentForm) {
+        assignAgentForm.addEventListener('submit', function (event) {
+            if (!document.querySelector('.order-checkbox:checked')) {
+                event.preventDefault();
+                alert('Please select at least one order.');
+            }
+        });
+    }
+    const claimOrderForm = document.getElementById('claimOrderForm');
+    if (claimOrderForm) {
+        claimOrderForm.addEventListener('submit', function (event) {
+            if (!document.querySelector('.order-checkbox:checked')) {
+                event.preventDefault();
+                alert('Please select at least one order.');
+            }
+        });
+    }
 
     const fraudModalElement = document.getElementById('fraudCheckModal');
     let fraudModal = null;
@@ -483,7 +544,8 @@ use Carbon\Carbon;
         }
     });
 
-    document.getElementById('bulkCourierSend').addEventListener('click', async function () {
+    const bulkCourierSend = document.getElementById('bulkCourierSend');
+    if (bulkCourierSend) bulkCourierSend.addEventListener('click', async function () {
         const orderIds = Array.from(document.querySelectorAll('.order-checkbox:checked')).map(checkbox => Number(checkbox.value));
         if (!orderIds.length) { courierFeedback('Please select at least one order.', 'error'); return; }
         const provider = document.getElementById('courierProvider').value;

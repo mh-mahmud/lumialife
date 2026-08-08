@@ -7,15 +7,51 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Models\OrderDetail;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class OrderService
 {
     public function getAllOrders()
     {
-        $orders = Order::join('billing_address', 'orders.billing_address_id', '=', 'billing_address.id')
+        $query = Order::join('billing_address', 'orders.billing_address_id', '=', 'billing_address.id')
             ->leftJoin('agents', 'orders.assigned_agent_id', '=', 'agents.agent_id')
             ->select('orders.id as lukaku', 'orders.*', 'billing_address.*',
-                DB::raw("TRIM(CONCAT(COALESCE(agents.first_name, ''), ' ', COALESCE(agents.last_name, ''))) as assigned_staff"))
+                DB::raw("TRIM(CONCAT(COALESCE(agents.first_name, ''), ' ', COALESCE(agents.last_name, ''))) as assigned_staff"));
+
+        $this->limitToAssignedStaff($query);
+
+        $orders = $query
+            ->orderBy('orders.id', 'desc')
+            ->paginate(config('constants.ROW_PER_PAGE'));
+
+        $this->attachOrderDetails($orders);
+
+        return $orders;
+    }
+
+    public function getUnassignedOrders()
+    {
+        return $this->getScopedOrders(fn (Builder $query) => $query->whereNull('orders.assigned_agent_id'));
+    }
+
+    public function getOrdersForAgent(string $agentId)
+    {
+        return $this->getScopedOrders(
+            fn (Builder $query) => $query->where('orders.assigned_agent_id', $agentId)
+        );
+    }
+
+    private function getScopedOrders(callable $scope)
+    {
+        $query = Order::join('billing_address', 'orders.billing_address_id', '=', 'billing_address.id')
+            ->leftJoin('agents', 'orders.assigned_agent_id', '=', 'agents.agent_id')
+            ->select('orders.id as lukaku', 'orders.*', 'billing_address.*',
+                DB::raw("TRIM(CONCAT(COALESCE(agents.first_name, ''), ' ', COALESCE(agents.last_name, ''))) as assigned_staff"));
+
+        $scope($query);
+
+        $orders = $query
             ->orderBy('orders.id', 'desc')
             ->paginate(config('constants.ROW_PER_PAGE'));
 
@@ -163,10 +199,14 @@ class OrderService
     {
         $searchTerm = trim($request->input('search'));
 
-        $orders = Order::join('billing_address', 'orders.billing_address_id', '=', 'billing_address.id')
+        $query = Order::join('billing_address', 'orders.billing_address_id', '=', 'billing_address.id')
             ->leftJoin('agents', 'orders.assigned_agent_id', '=', 'agents.agent_id')
             ->select('orders.id as lukaku', 'orders.*', 'billing_address.*',
-                DB::raw("TRIM(CONCAT(COALESCE(agents.first_name, ''), ' ', COALESCE(agents.last_name, ''))) as assigned_staff"))
+                DB::raw("TRIM(CONCAT(COALESCE(agents.first_name, ''), ' ', COALESCE(agents.last_name, ''))) as assigned_staff"));
+
+        $this->limitToAssignedStaff($query);
+
+        $orders = $query
             ->where(function ($query) use ($searchTerm) {
                 $query->where('orders.custom_order_id', 'LIKE', "%$searchTerm%")
                     ->orWhere('orders.order_phone_number', 'LIKE', "%$searchTerm%")
@@ -180,6 +220,15 @@ class OrderService
         $this->attachOrderDetails($orders);
 
         return $orders;
+    }
+
+    private function limitToAssignedStaff(Builder $query): void
+    {
+        $user = Auth::user();
+
+        if ($user && $user->user_type !== 'admin') {
+            $query->where('agents.user_id', $user->id);
+        }
     }
 
     private function attachOrderDetails($orders)

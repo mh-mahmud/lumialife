@@ -32,5 +32,11 @@ class Agent extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function assignedOrders()
+    {
+        return $this->hasMany(Order::class, 'assigned_agent_id', 'agent_id');
+    }
+
     protected $table = 'agents';
 }

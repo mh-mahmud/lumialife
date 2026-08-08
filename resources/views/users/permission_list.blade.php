@@ -27,7 +27,8 @@ use Carbon\Carbon;
         <div class="d-flex align-items-center py-1">
 
             <!--begin::Button-->
-            <a href="{{ route('create-permission') }}" class="btn btn-sm btn-primary" id="kt_toolbar_primary_button">Create</a>
+            <a href="{{ route('role-list') }}" class="btn btn-sm btn-light-primary me-2">Assign / Change Role</a>
+            <a href="{{ route('create-permission') }}" class="btn btn-sm btn-primary" id="kt_toolbar_primary_button">Add Permission</a>
 
             <!--end::Button-->
         </div>
@@ -64,6 +65,12 @@ use Carbon\Carbon;
             timer: 1500
         });
     </script>
+    @endif
+
+    @if (($syncedCount ?? 0) > 0)
+    <div class="alert alert-success mt-4 mb-0">
+        {{ $syncedCount }} missing route {{ Str::plural('permission', $syncedCount) }} added. You can now assign them from Role Create/Edit.
+    </div>
     @endif
 
     <!--End Table Alert Message-->
@@ -113,7 +120,7 @@ use Carbon\Carbon;
                             <thead>
                                 <tr class="fw-bolder text-muted bg-light bd-cyan">
                                     <th class="ps-4 min-w-25px">SL</th>
-                                    <th class="min-w-140px">Parent Id</th>
+                                    <th class="min-w-140px">Permission Group</th>
                                     <th class="min-w-150px">Permission name</th>
                                     <th class="min-w-140px">Slug</th>
                                     <!-- <th class="min-w-120px">Details</th> -->
@@ -128,7 +135,7 @@ use Carbon\Carbon;
                                 <tr>
 
                                     <td class="ps-5 text-dark fs-6">{{($users->currentPage() - 1) * $users->perPage() + $loop->iteration}}</td>
-                                    <td class="text-dark fs-6">{{$user->parent_id}}</td>
+                                    <td class="text-dark fs-6">{{ $user->parent?->name ?? 'Parent Group' }}</td>
                                     <td class="text-dark fs-6">{{$user->name}}</td>
                                     <td class="text-dark fs-6">{{$user->sub_name }}</td>
                                     <!-- <td class="text-dark fs-6">{{$user->details}}</td> -->
